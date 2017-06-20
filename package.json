@@ -1,0 +1,17 @@
+{
+  "name": "tradeit_cqrs",
+  "version": "1.0.0",
+  "description": "TradeIT with Core",
+  "main": "index.js",
+  "scripts": {
+    "test": "node node_modules/.bin/cucumber-js"
+  },
+  "keywords": [
+    "TradeIT"
+  ],
+  "author": "Suren Rodrigo",
+  "license": "MIT",
+  "devDependencies": {
+    "serverless": "^1.15.3"
+  }
+}
