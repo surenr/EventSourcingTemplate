@@ -22,8 +22,17 @@ provider:
   runtime: nodejs6.10
   stage: dev
   region: ap-southeast-2
-  profile: TradeIT
-
+  profile: default
+  iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:*
+        Resource: arn:aws:dynamodb:*:*:table/event-source
+      -  Effect: "Allow"
+         Action:
+           - "sns:publish"
+         Resource: "arn:aws:sns:ap-southeast-2:296927073230:*"
+          
 functions:
   commandHandler:
     handler: handler.commandHandler
@@ -34,53 +43,63 @@ functions:
   eventHandler:
     handler: handler.eventHandler   
     events:
-      - stream: arn:aws:dynamodb:ap-southeast-2:296927073230:table/event-source/stream/2017-06-20T09:43:58.432
-         
-#    The following are a few example events you can configure
-#    NOTE: Please make sure to change your handler code to work with those events
-#    Check the event documentation for details
-#    events:
-#      - http:
-#          path: users/create
-#          method: get
-#      - s3: ${env:BUCKET}
-#      - schedule: rate(10 minutes)
-#      - sns: greeter-topic
-#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
-#      - alexaSkill
-#      - iot:
-#          sql: "SELECT * FROM 'some_topic'"
-#      - cloudwatchEvent:
-#          event:
-#            source:
-#              - "aws.ec2"
-#            detail-type:
-#              - "EC2 Instance State-change Notification"
-#            detail:
-#              state:
-#                - pending
-#      - cloudwatchLog: '/aws/lambda/hello'
-#      - cognitoUserPool:
-#          pool: MyUserPool
-#          trigger: PreSignUp
+      - stream:
+          type: dynamodb
+          arn: 
+            Fn::GetAtt:
+              - EventSource
+              - StreamArn   
+          batchSize: 100
+          startingPosition: LATEST
+          enabled: true
 
-#    Define function environment variables here
-#    environment:
-#      variable2: value2
-
-# you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
 resources:  
   Resources:
+    NotificationSNSTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        DisplayName: 'Notification Message Dispacher'
+        TopicName: NotificationSNSTopic
+    DocumentationSNSTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        DisplayName: 'Documentation Message Dispacher'
+        TopicName: DocumentationSNSTopic
+    UserGroupSNSTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        DisplayName: 'UserGroup Message Dispacher'
+        TopicName: UserGroupSNSTopic
+    TransactionSNSTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        DisplayName: 'Transaction Message Dispacher'
+        TopicName: TransactionSNSTopic
+    BuyerSNSTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        DisplayName: 'Buyer Message Dispacher'
+        TopicName: BuyerSNSTopic
+    SellerSNSTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        DisplayName: 'Seller Message Dispacher'
+        TopicName: SellerSNSTopic
+    IssuingBankSNSTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        DisplayName: 'IssuingBank Message Dispacher'
+        TopicName: IssuingBankSNSTopic
+    AdvisingBankSNSTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        DisplayName: 'AdvisingBank Message Dispacher'
+        TopicName: AdvisingBankSNSTopic
+    DeNormalizerSNSTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        DisplayName: 'DeNormalizer Message Dispacher'
+        TopicName: DeNormalizerSNSTopic
     EventSource:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -96,22 +115,4 @@ resources:
           WriteCapacityUnits: 5
         StreamSpecification:
           StreamViewType: NEW_IMAGE
-    DynamoDBIamPolicy:
-      Type: AWS::IAM::Policy
-      DependsOn: EventSource
-      Properties:
-        PolicyName: lambda-dynamodb
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - dynamodb:DescribeStream
-                - dynamodb:GetRecords
-                - dynamodb:GetShardIterator
-                - dynamodb:ListStreams
-                - dynamodb:GetItem
-                - dynamodb:PutItem
-              Resource: arn:aws:dynamodb:*:*:table/event-source
-        Roles:
-          - Ref: IamRoleLambdaExecution
+    
