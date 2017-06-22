@@ -1,0 +1,37 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: transactionCommands
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+frameworkVersion: "=1.15.3"
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: dev
+  region: ap-southeast-2
+  profile: TradeIT
+  iamRoleStatements:
+      -  Effect: "Allow"
+         Action:
+           - "sns:publish"
+           - "sns:subscribe"
+         Resource: "arn:aws:sns:ap-southeast-2:296927073230:*"
+          
+functions:
+  transactionCommandHandler:
+    handler: handler.transactionCommandHandler
+    events:
+      - sns: arn:aws:sns:ap-southeast-2:296927073230:TransactionSNSTopic

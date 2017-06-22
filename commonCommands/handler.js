@@ -1,41 +1,37 @@
-'use strict';
+const AWS = require('aws-sdk');
 
 module.exports.commandHandler = (event, context, callback) => {
   if (event.path === '/tradeit/command') {
-    const AWS = require("aws-sdk");
     const eventData = JSON.parse(event.body);
     let response = {};
     if (!eventData.commandName || !eventData.commandCode) {
       response = {
         statusCode: 500,
-        body: "Un-identified command, no commandName or commandCode found in the request.",
+        body: 'Un-identified command, no commandName or commandCode found in the request.',
       };
     }
     AWS.config.update({
-      region: "ap-southeast-2"
+      region: 'ap-southeast-2',
     });
 
-    let docClient = new AWS.DynamoDB.DocumentClient();
+    const docClient = new AWS.DynamoDB.DocumentClient();
 
-    let table = "event-source";
-    let eventDateTime = new Date();
-    let eventSequenceId = eventDateTime.getTime();
+    const table = 'event-source';
+    const eventDateTime = new Date();
+    const eventSequenceId = eventDateTime.getTime();
 
-    let params = {
+    const params = {
       TableName: table,
       Item: {
-        "sequence": eventSequenceId,
-        "issuedOn": eventDateTime.toString(),
-        "commandName": eventData.commandName,
-        "commandCode": eventData.commandCode,
-        "payload": eventData.payload
-      }
+        sequence: eventSequenceId,
+        issuedOn: eventDateTime.toString(),
+        commandName: eventData.commandName,
+        commandCode: eventData.commandCode,
+        payload: eventData.payload,
+      },
     };
-    console.log(params)
-    console.log("Adding a new event...");
-    return docClient.put(params, function (error, data) {
-      console.log(error);
-      console.log(data);
+
+    return docClient.put(params, (error) => {
       if (error) {
         response = {
           statusCode: 500,
@@ -50,10 +46,10 @@ module.exports.commandHandler = (event, context, callback) => {
       callback(null, response);
     });
   }
-  callback(new Error('Invalid Command API Call'), null);
+  return callback(new Error('Invalid Command API Call'), null);
 };
 
 module.exports.eventHandler = (event, context, callback) => {
   console.log(event);
-  callback(null, "Event Fired");
+  callback(null, 'Event Fired');
 };

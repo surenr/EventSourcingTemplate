@@ -4,7 +4,7 @@
   "description": "TradeIT with Core",
   "main": "index.js",
   "scripts": {
-    "test": "node node_modules/.bin/cucumber-js"
+    "test": "jasmine-node commonCommands/ commonServices/ userGroupCommands/ transactionCommands/"
   },
   "keywords": [
     "TradeIT"
@@ -12,6 +12,19 @@
   "author": "Suren Rodrigo",
   "license": "MIT",
   "devDependencies": {
+    "eslint": "^4.0.0",
+    "eslint-config-airbnb-base": "^11.2.0",
+    "eslint-plugin-import": "^2.3.0",
+    "gulp": "^3.9.1",
+    "gulp-multi-dest": "0.0.4",
+    "gulp-sequence": "^0.4.6",
+    "gulp-shell": "^0.6.3",
+    "jasmine": "^2.6.0",
+    "jasmine-node": "^1.14.5",
+    "jasmine-reporters": "^2.2.1",
     "serverless": "^1.15.3"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.74.0"
   }
 }
