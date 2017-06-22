@@ -1,5 +1,5 @@
 describe('Test User Group and Users Related Services', () => {
-    const userGroupCommandHandler = require('../handler');
+    const awsHandler = require('../handler');
     const addNewGroupAction = require('../libs/actions/addNewGroup');
     const newGroupData = {
         groupName: 'Manager',
@@ -9,7 +9,7 @@ describe('Test User Group and Users Related Services', () => {
     }
 
     it('Miro service handler is accessible', () => {
-        expect(userGroupCommandHandler).toBeDefined();
+        expect(awsHandler.userGroupCommandHandler).toBeDefined();
     });
 
     it('Action Exists to create a new user group', () => {
@@ -18,8 +18,10 @@ describe('Test User Group and Users Related Services', () => {
     });
 
     it('Make sure addNewGroupAction perform method get the correct parameters', () => {
-        spyOn(addNewGroupAction,'perform').and.callFake(()=>{
-
-        })
+        spyOn(addNewGroupAction,'perform').andCallFake(()=>{
+            expect(arguments[0]).toEqual(newGroupData);
+        });
+        awsHandler.userGroupCommandHandler();
+        expect(addNewGroupAction.perform).toHaveBeenCalled();
     });
 });
