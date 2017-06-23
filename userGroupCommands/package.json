@@ -1,0 +1,17 @@
+{
+  "name": "user_group_commands",
+  "version": "1.0.0",
+  "description": "User Group Command Service",
+  "main": "handler.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Suren Rodrigo",
+  "license": "ISC",
+  "dependencies": {
+    "mongoose": "^4.10.8"
+  }
+}
