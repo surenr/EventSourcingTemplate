@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+<testsuite name="Test User Group and Users Related Services" errors="0" tests="1" failures="0" time="0.506" timestamp="2017-06-23T19:15:53">
+  <testcase classname="Test User Group and Users Related Services" name="Miro service handler is accessible" time="0"></testcase>
+</testsuite>
+<testsuite name="Test User Group and Users Related Services.Add New User Group Action Tests" errors="0" tests="6" failures="0" time="0.506" timestamp="2017-06-23T19:15:53">
+  <testcase classname="Test User Group and Users Related Services.Add New User Group Action Tests" name="Action Exists to create a new user group" time="0.001"></testcase>
+  <testcase classname="Test User Group and Users Related Services.Add New User Group Action Tests" name="Make sure the AddNewGroupAction emit reject event if the command code is not a match" time="0.002"></testcase>
+  <testcase classname="Test User Group and Users Related Services.Add New User Group Action Tests" name="AddNewGroupAction emit error event when an exception is thrown by any operation within the action" time="0"></testcase>
+  <testcase classname="Test User Group and Users Related Services.Add New User Group Action Tests" name="UserGroup Model is accessible " time="0.383"></testcase>
+  <testcase classname="Test User Group and Users Related Services.Add New User Group Action Tests" name="AddNewGroupAction will validate data" time="0.062"></testcase>
+  <testcase classname="Test User Group and Users Related Services.Add New User Group Action Tests" name="AddNewGroupAction will add a new group with the correct data" time="0.058"></testcase>
+</testsuite>
+</testsuites>

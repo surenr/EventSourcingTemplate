@@ -16,6 +16,7 @@
     "eslint-config-airbnb-base": "^11.2.0",
     "eslint-plugin-import": "^2.3.0",
     "gulp": "^3.9.1",
+    "gulp-jasmine": "^2.4.2",
     "gulp-multi-dest": "0.0.4",
     "gulp-sequence": "^0.4.6",
     "gulp-shell": "^0.6.3",
@@ -27,6 +28,8 @@
     "sinon": "^2.3.5"
   },
   "dependencies": {
-    "aws-sdk": "^2.74.0"
+    "aws-sdk": "^2.74.0",
+    "lodash": "^4.17.4",
+    "validator": "^7.1.0"
   }
 }

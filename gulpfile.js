@@ -2,6 +2,7 @@ const gulp = require('gulp');
 const multiDest = require('gulp-multi-dest');
 const shell = require('gulp-shell');
 const gulpSequence = require('gulp-sequence');
+const jasmine = require('gulp-jasmine');
 
 gulp.task('copy common services', function () {
     let destOptions = {
@@ -24,20 +25,25 @@ gulp.task('Deploy transaction commands', shell.task([
     '"../node_modules/.bin/serverless" deploy -v'
 ], { cwd: './transactionCommands' }));
 
-// Add the Testing capabilities for all the services
-gulp.task('Test Common Services', function () {
-    return gulp.src(['./commonServices/tests/**/test*.js'])
-        .pipe(jasmineNode({ verbose: true }))
-        .on('error', function (error) {
-            console.log(error.message);
-            this.emit('end');
-        });
-});
+// // Add the Testing capabilities for all the services
+// gulp.task('Test Common Services', function () {
+//     return gulp.src(['./commonServices/tests/**/test*.js'])
+//         .pipe(jasmineNode({ verbose: true }))
+//         .on('error', function (error) {
+//             console.log(error.message);
+//             this.emit('end');
+//         });
+// });
 
 // Expose the development tasks
-gulp.task('Test Services', ['copy common services'], shell.task([
-    '"./node_modules/.bin/jasmine-node" commonCommands/ commonServices/ userGroupCommands/ transactionCommands/ --color --verbose'
-], { cwd: '.' }));
+// gulp.task('Test Services', ['copy common services'], shell.task([
+//     '"./node_modules/.bin/jasmine-node" commonCommands/ commonServices/ userGroupCommands/ transactionCommands/ --color --verbose --junitreport --output reports'
+// ], { cwd: '.' }));
+
+gulp.task('Test Services',['copy common services'], function () {
+    return gulp.src(['commonCommands/tests/**/*.js', 'commonServices/tests/**/*.js', 'userGroupCommands/tests/**/*.js'])
+        .pipe(jasmine({verbose:true, includeStackTrace: true}));
+});
 
 gulp.task('test-watch', function () {
     gulp.watch(['commonCommands/**/*.js', 'commonServices/**/*.js', 'userGroupCommands/**/*.js'], ['Test Services']);

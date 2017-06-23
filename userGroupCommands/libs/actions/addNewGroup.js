@@ -6,10 +6,50 @@
     this.ActionName = 'cmdAddNewGroup';
   }
   util.inherits(AddNewGroupAction, baseAction);
-  AddNewGroupAction.prototype.doWork = function (params) {
+
+  function customValidate(userGroupInstance, userGroupModel, payload) {
     return new Promise((resolve, reject) => {
-      if (params.payload) {
-        resolve(params.payload);
+      const generalValidationErrors = userGroupInstance.validateSync();
+      if (generalValidationErrors) {
+        reject(generalValidationErrors);
+      } else {
+        userGroupModel.find({ entityId: payload.entityId, groupName: payload.groupName },
+          (err, docs) => {
+            if (err) reject(err);
+
+            if (docs.length > 0) {
+              reject(new Error(`Group "${payload.groupName}" Already Exists.`));
+            } else {
+              resolve();
+            }
+          });
+      }
+    });
+  }
+  AddNewGroupAction.prototype.doWork = function (params) {
+    const dbService = params.dbService;
+    const userGroupSchema = params.userGroupSchema;
+    const payload = params.payload;
+    return new Promise((resolve, reject) => {
+      if (payload) {
+        const UserGroupModel = dbService.model('UserGroups', userGroupSchema);
+
+        const newUserGroup = new UserGroupModel({
+          groupId: payload.groupId,
+          groupName: payload.groupName,
+          entityId: payload.entityId,
+          allowedActions: payload.allowedActions,
+        });
+        customValidate(newUserGroup, UserGroupModel, payload).then(() => {
+          newUserGroup.save((error, userGroup) => {
+            if (error) {
+              reject(error);
+            }
+            resolve(userGroup);
+          });
+        }, (error) => {
+          reject(error);
+        }).catch((error) => { reject(error); });
       } else {
         throw new Error('Payload Empty');
       }

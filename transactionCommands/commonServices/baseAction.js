@@ -22,6 +22,8 @@
       }
       this.doWork(paramContext).then((data) => {
         this.emit('done', data);
+      }, (error) => {
+        this.emit('error', error);
       }).catch((error) => { this.emit('error', error); });
     } catch (error) {
       this.emit('error', error);

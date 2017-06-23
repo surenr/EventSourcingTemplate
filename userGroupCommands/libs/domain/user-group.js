@@ -1,12 +1,19 @@
 const mongoose = require('mongoose');
 
 const UserGroupSchema = new mongoose.Schema({
-  _id: mongoose.SchemaTypes.ObjectId,
-  groupId: String,
-  groupName: String,
-  entityId: String,
+  groupId: {
+    type: String,
+    required: [true, 'NoGroupId'],
+  },
+  groupName: {
+    type: String,
+    required: [true, 'NoGroupName'],
+  },
+  entityId: {
+    type: String,
+    required: [true, 'NoEntityId'],
+  },
   allowedActions: [String],
-  allowedRoutes: [String],
 });
 
-module.exports = mongoose.model('UserGroup', UserGroupSchema); 
+module.exports = UserGroupSchema;

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+<testsuite name="Common Services Configuration Settings" errors="0" tests="1" failures="0" time="0.003" timestamp="2017-06-23T19:15:53">
+  <testcase classname="Common Services Configuration Settings" name="SNS Base ARN has a value" time="0.002"></testcase>
+</testsuite>
+</testsuites>
