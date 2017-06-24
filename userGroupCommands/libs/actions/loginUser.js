@@ -33,13 +33,14 @@
         const ActiveUserModel = dbService.model('ActiveUsers', activeUserSchema);
         UserModel.findOne({ email }, (error, userDetails) => {
           if (error) reject(error);
+          console.log(passwordToMatch);
           bcrypt.compare(passwordToMatch, userDetails.password).then((isAMatch) => {
-            if (!isAMatch) reject(new Error('InvalidCredentials'));
+            if (!isAMatch) return reject(new Error('InvalidCredentials'));
             const generatedOn = new Date();
             const validTill = new Date(generatedOn.getTime() + (30 * 60 * 1000));
             UserGroupModel.findOne({ groupId: userDetails.groupId },
               (userGroupErrors, userGroupDetails) => {
-                if (userGroupErrors) reject(userGroupErrors);
+                if (userGroupErrors) return reject(userGroupErrors);
                 const newActiveUser = new ActiveUserModel({
                   userId: userDetails.userId,
                   groupId: userGroupDetails.groupId,
@@ -53,7 +54,7 @@
                   validTill,
                 });
 
-                customValidate(newActiveUser).then(() => {
+                return customValidate(newActiveUser).then(() => {
                   newActiveUser.save((activeUserErrors, activeUser) => {
                     if (activeUserErrors) {
                       reject(activeUserErrors);

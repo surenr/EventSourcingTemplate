@@ -41,12 +41,12 @@ gulp.task('Deploy transaction commands', shell.task([
 // ], { cwd: '.' }));
 
 gulp.task('Test Services',['copy common services'], function () {
-    return gulp.src(['commonCommands/tests/**/*.js', 'commonServices/tests/**/*.js', 'userGroupCommands/tests/**/*.js'])
+    return gulp.src(['commonCommands/tests/**/*.js', 'commonServices/tests/**/*.js', 'userGroupCommands/tests/**/*.js', 'transactionCommands/tests/**/*.js'])
         .pipe(jasmine({verbose:true, includeStackTrace: true}));
 });
 
 gulp.task('test-watch', function () {
-    gulp.watch(['commonCommands/**/*.js', 'commonServices/**/*.js', 'userGroupCommands/**/*.js'], ['Test Services']);
+    gulp.watch(['commonCommands/**/*.js', 'commonServices/**/*.js', 'userGroupCommands/**/*.js', 'transactionCommands/**/*.js'], ['Test Services']);
 });
 gulp.task('test-all', ['Test Services']);
 gulp.task('default', ['copy common services']);

@@ -4,6 +4,7 @@ describe('Test User Group and Users Related Services', () => {
     const UpdateUserGroup = require('../libs/actions/updateNewGroup');
     const uuidv4 = require('uuid/v4');
     const util = require('util');
+    const CONNECTION_STRING = 'mongodb://usrtradeitdb:tradeituserPa$$wd@SG-TradeIT-10478.servers.mongodirector.com:27017/tradeit';
     let addNewGroupWorker;
     let updateUserGroupWorker;
     beforeEach(function (done) {
@@ -15,7 +16,7 @@ describe('Test User Group and Users Related Services', () => {
     afterAll(function (done) {
         let dbService = require('mongoose');
         let userGroupSchema = require('../libs/domain/user-group');
-        dbService.connect('mongodb://localhost:27017/tradeItEvent');
+        dbService.connect(CONNECTION_STRING);
         const db = dbService.connection;
         db.on('error', () => {
             throw new Error('Connection Error');
@@ -93,7 +94,7 @@ describe('Test User Group and Users Related Services', () => {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
 
-            dbService.connect('mongodb://localhost:27017/tradeItEvent');
+            dbService.connect(CONNECTION_STRING);
             const db = dbService.connection;
             db.on('error', () => {
                 throw new Error('Connection Error');
@@ -130,7 +131,7 @@ describe('Test User Group and Users Related Services', () => {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
 
-            dbService.connect('mongodb://localhost:27017/tradeItEvent');
+            dbService.connect(CONNECTION_STRING);
             const db = dbService.connection;
             db.on('error', () => {
                 throw new Error('Connection Error');
@@ -160,7 +161,7 @@ describe('Test User Group and Users Related Services', () => {
             it('Adding the First Test Success', (done) => {
                 let dbService = require('mongoose');
                 let userGroupSchema = require('../libs/domain/user-group');
-                dbService.connect('mongodb://localhost:27017/tradeItEvent');
+                dbService.connect(CONNECTION_STRING);
                 const db = dbService.connection;
                 db.on('error', () => {
                     throw new Error('Connection Error');
@@ -191,7 +192,7 @@ describe('Test User Group and Users Related Services', () => {
             it('Adding Existing User groups under the same entity will throw an error', (done) => {
                 let dbService = require('mongoose');
                 let userGroupSchema = require('../libs/domain/user-group');
-                dbService.connect('mongodb://localhost:27017/tradeItEvent');
+                dbService.connect(CONNECTION_STRING);
                 const db = dbService.connection;
                 db.on('error', () => {
                     throw new Error('Connection Error');
@@ -240,7 +241,7 @@ describe('Test User Group and Users Related Services', () => {
         it('Adding the new group', function (done) {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
-            dbService.connect('mongodb://localhost:27017/tradeItEvent');
+            dbService.connect(CONNECTION_STRING);
             const db = dbService.connection;
             db.on('error', () => {
                 throw new Error('Connection Error');
@@ -268,7 +269,7 @@ describe('Test User Group and Users Related Services', () => {
         it('Update the group', function (done) {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
-            dbService.connect('mongodb://localhost:27017/tradeItEvent');
+            dbService.connect(CONNECTION_STRING);
             const db = dbService.connection;
             db.on('error', () => {
                 throw new Error('Connection Error');

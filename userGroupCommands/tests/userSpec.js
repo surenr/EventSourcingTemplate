@@ -4,7 +4,7 @@ describe('Test User Group and Users Related Services', () => {
     const AddNewGroupAction = require('../libs/actions/addNewGroup');
     const UpdateUserAction = require('../libs/actions/updateNewUser');
     const UserLoginAction = require('../libs/actions/loginUser');
-
+    const CONNECTION_STRING = 'mongodb://usrtradeitdb:tradeituserPa$$wd@SG-TradeIT-10478.servers.mongodirector.com:27017/tradeit';
     const uuidv4 = require('uuid/v4');
     const util = require('util');
     let addNewUserWorker;
@@ -26,7 +26,7 @@ describe('Test User Group and Users Related Services', () => {
         let userGroupSchema = require('../libs/domain/user-group');
         let activeUserSchema = require('../libs/domain/loggedInUser');
 
-        dbService.connect('mongodb://localhost:27017/tradeItEvent');
+        dbService.connect(CONNECTION_STRING);
         const db = dbService.connection;
         let promiseArray = [];
         db.on('error', () => {
@@ -107,7 +107,7 @@ describe('Test User Group and Users Related Services', () => {
         it('Add a new group so that we can add users', (done) => {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
-            dbService.connect('mongodb://localhost:27017/tradeItEvent');
+            dbService.connect(CONNECTION_STRING);
             const db = dbService.connection;
             db.on('error', () => {
                 throw new Error('Connection Error');
@@ -137,7 +137,7 @@ describe('Test User Group and Users Related Services', () => {
             let userSchema = require('../libs/domain/users');
             newUserData.groupId = insertedFirstGroup.groupId;
             newUserData.entityId = insertedFirstGroup.entityId;
-            dbService.connect('mongodb://localhost:27017/tradeItEvent');
+            dbService.connect(CONNECTION_STRING);
             const db = dbService.connection;
             db.on('error', () => {
                 throw new Error('Connection Error');
@@ -176,7 +176,7 @@ describe('Test User Group and Users Related Services', () => {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
             let userSchema = require('../libs/domain/users');
-            dbService.connect('mongodb://localhost:27017/tradeItEvent');
+            dbService.connect(CONNECTION_STRING);
             const db = dbService.connection;
             db.on('error', () => {
                 throw new Error('Connection Error');
@@ -212,7 +212,7 @@ describe('Test User Group and Users Related Services', () => {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
             let userSchema = require('../libs/domain/users');
-            dbService.connect('mongodb://localhost:27017/tradeItEvent');
+            dbService.connect(CONNECTION_STRING);
             const db = dbService.connection;
             db.on('error', () => {
                 throw new Error('Connection Error');
@@ -249,7 +249,7 @@ describe('Test User Group and Users Related Services', () => {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
             let userSchema = require('../libs/domain/users');
-            dbService.connect('mongodb://localhost:27017/tradeItEvent');
+            dbService.connect(CONNECTION_STRING);
             const db = dbService.connection;
             db.on('error', () => {
                 throw new Error('Connection Error');
@@ -292,7 +292,7 @@ describe('Test User Group and Users Related Services', () => {
         it('Add a new group so that we can add users', (done) => {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
-            dbService.connect('mongodb://localhost:27017/tradeItEvent');
+            dbService.connect(CONNECTION_STRING);
             const db = dbService.connection;
             newGroupData.groupId = uuidv4();
             newGroupData.groupName = "Clark";
@@ -327,7 +327,7 @@ describe('Test User Group and Users Related Services', () => {
             newUserData.entityId = insertedSecondGroup.entityId;
             newUserData.email = 'kamal@gmail.com';
 
-            dbService.connect('mongodb://localhost:27017/tradeItEvent');
+            dbService.connect(CONNECTION_STRING);
             const db = dbService.connection;
             db.on('error', () => {
                 throw new Error('Connection Error');
@@ -365,7 +365,7 @@ describe('Test User Group and Users Related Services', () => {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
             let userSchema = require('../libs/domain/users');
-            dbService.connect('mongodb://localhost:27017/tradeItEvent');
+            dbService.connect(CONNECTION_STRING);
             const db = dbService.connection;
             db.on('error', () => {
                 throw new Error('Connection Error');
@@ -406,7 +406,7 @@ describe('Test User Group and Users Related Services', () => {
             let userSchema = require('../libs/domain/users');
             userToUpdate.groupId = insertedFirstGroup.groupId;
             userToUpdate.entityId = insertedFirstGroup.entityId;
-            dbService.connect('mongodb://localhost:27017/tradeItEvent');
+            dbService.connect(CONNECTION_STRING);
             const db = dbService.connection;
             db.on('error', () => {
                 throw new Error('Connection Error');
@@ -447,7 +447,7 @@ describe('Test User Group and Users Related Services', () => {
             let activeUserSchema = require('../libs/domain/loggedInUser');
 
 
-            dbService.connect('mongodb://localhost:27017/tradeItEvent');
+            dbService.connect(CONNECTION_STRING);
             const db = dbService.connection;
             db.on('error', () => {
                 throw new Error('Connection Error');
@@ -474,6 +474,47 @@ describe('Test User Group and Users Related Services', () => {
                     db.close((error) => {
                         if (error) throw error;
                         fail(activeUserError);
+                        done();
+                    });
+                });
+                userLoginWorker.perform('cmdLoginUser', paramContext);
+            });
+        });
+
+        it('invalid credentials will throw an error', (done) => {
+            let dbService = require('mongoose');
+            let userGroupSchema = require('../libs/domain/user-group');
+            let userSchema = require('../libs/domain/users');
+            let activeUserSchema = require('../libs/domain/loggedInUser');
+
+
+            dbService.connect(CONNECTION_STRING);
+            const db = dbService.connection;
+            db.on('error', () => {
+                throw new Error('Connection Error');
+            });
+            db.once('open', () => {
+                let paramContext = {
+                    email: insertedUserData.email,
+                    password: 'kdkdk@123',
+                    dbService: dbService,
+                    userGroupSchema: userGroupSchema,
+                    userSchema: userSchema,
+                    activeUserSchema: activeUserSchema,
+                };
+                userLoginWorker.on('done', (activeUserObject) => {
+                    db.close((error) => {
+                        if (error) throw error;
+                        fail('Invalid users were allowed to login');
+                        done();
+                    })
+                });
+
+                userLoginWorker.on('error', (activeUserError) => {
+                    db.close((error) => {
+                        if (error) throw error;
+                        console.log('on error call', activeUserError.message ==='InvalidCredentials');
+                        expect(activeUserError.message).toEqual('InvalidCredentials');
                         done();
                     });
                 });
