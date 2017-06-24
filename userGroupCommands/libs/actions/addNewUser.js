@@ -29,11 +29,11 @@
     });
   }
   AddNewUserAction.prototype.doWork = function (params) {
-    const dbService = params.dbService;
-    const userSchema = params.userSchema;
-    const groupSchema = params.userGroupSchema;
-    const payload = params.payload;
     return new Promise((resolve, reject) => {
+      const dbService = params.dbService;
+      const userSchema = params.userSchema;
+      const groupSchema = params.userGroupSchema;
+      const payload = params.payload;
       if (payload) {
         const UserModel = dbService.model('Users', userSchema);
         const UserGroupModel = dbService.model('UserGroup', groupSchema);

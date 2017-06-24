@@ -18,15 +18,14 @@
     });
   }
   LoginUserAction.prototype.doWork = function (params) {
-    const dbService = params.dbService;
-    const userSchema = params.userSchema;
-    const groupSchema = params.userGroupSchema;
-    const activeUserSchema = params.activeUserSchema;
-
-    const email = params.email;
-    const passwordToMatch = params.password;
-
     return new Promise((resolve, reject) => {
+      const dbService = params.dbService;
+      const userSchema = params.userSchema;
+      const groupSchema = params.userGroupSchema;
+      const activeUserSchema = params.activeUserSchema;
+
+      const email = params.email;
+      const passwordToMatch = params.password;
       if (email && passwordToMatch) {
         const UserModel = dbService.model('Users', userSchema);
         const UserGroupModel = dbService.model('UserGroup', groupSchema);

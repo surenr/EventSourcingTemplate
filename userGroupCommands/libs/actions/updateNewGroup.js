@@ -8,11 +8,11 @@
   util.inherits(UpdateUserGroup, baseAction);
 
   UpdateUserGroup.prototype.doWork = function (params) {
-    const dbService = params.dbService;
-    const userGroupSchema = params.userGroupSchema;
-    const targetGroupId = params.id;
-    const payload = params.payload;
     return new Promise((resolve, reject) => {
+      const dbService = params.dbService;
+      const userGroupSchema = params.userGroupSchema;
+      const targetGroupId = params.id;
+      const payload = params.payload;
       if (payload) {
         const UserGroupModel = dbService.model('UserGroups', userGroupSchema);
         UserGroupModel.findByIdAndUpdate(targetGroupId, { $set: params.payload }, { new: true },

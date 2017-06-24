@@ -1,18 +1,18 @@
 (function () {
   const util = require('util');
   const baseAction = require('../../commonServices/baseAction');
- 
- function UpdateUserAction() {
+
+  function UpdateUserAction() {
     this.ActionName = 'cmdUpdateUser';
   }
   util.inherits(UpdateUserAction, baseAction);
   UpdateUserAction.prototype.doWork = function (params) {
-    const dbService = params.dbService;
-    const userSchema = params.userSchema;
-    const groupSchema = params.userGroupSchema;
-    const targetObjectId = params.id;
-    const payload = params.payload;
     return new Promise((resolve, reject) => {
+      const dbService = params.dbService;
+      const userSchema = params.userSchema;
+      const groupSchema = params.userGroupSchema;
+      const targetObjectId = params.id;
+      const payload = params.payload;
       if (payload) {
         const UserModel = dbService.model('Users', userSchema);
         const UserGroupModel = dbService.model('UserGroup', groupSchema);

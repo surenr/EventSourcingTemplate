@@ -107,28 +107,20 @@ describe('Test User Group and Users Related Services', () => {
         it('Add a new group so that we can add users', (done) => {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
-            dbService.connect(CONNECTION_STRING);
-            const db = dbService.connection;
-            db.on('error', () => {
-                throw new Error('Connection Error');
-            });
-            db.once('open', () => {
-                let paramContext = {
-                    payload: newGroupData,
-                    dbService: dbService,
-                    userGroupSchema: userGroupSchema
-                }
 
-                addNewGroupWorker.on('done', (returnObject) => {
+            let paramContext = {
+                payload: newGroupData,
+                dbService: dbService,
+                userGroupSchema: userGroupSchema
+            }
 
-                    db.close((error) => {
-                        if (error) throw error;
-                        insertedFirstGroup = returnObject;
-                        done();
-                    })
-                })
-                addNewGroupWorker.perform('cmdAddNewGroup', paramContext);
-            });
+            addNewGroupWorker.on('done', (returnObject) => {
+                insertedFirstGroup = returnObject;
+                done();
+
+            })
+            addNewGroupWorker.perform('cmdAddNewGroup', paramContext);
+
         });
 
         it('Add a new user to the group', (done) => {
@@ -137,37 +129,28 @@ describe('Test User Group and Users Related Services', () => {
             let userSchema = require('../libs/domain/users');
             newUserData.groupId = insertedFirstGroup.groupId;
             newUserData.entityId = insertedFirstGroup.entityId;
-            dbService.connect(CONNECTION_STRING);
-            const db = dbService.connection;
-            db.on('error', () => {
-                throw new Error('Connection Error');
-            });
-            db.once('open', () => {
-                let paramContext = {
-                    payload: newUserData,
-                    dbService: dbService,
-                    userGroupSchema: userGroupSchema,
-                    userSchema: userSchema,
-                }
+            let paramContext = {
+                payload: newUserData,
+                dbService: dbService,
+                userGroupSchema: userGroupSchema,
+                userSchema: userSchema,
+            }
 
-                addNewUserWorker.on('done', (returnObject) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        expect(returnObject.groupId).toEqual(insertedFirstGroup.groupId);
-                        expect(returnObject.email).toEqual('surenr@99x.lk');
-                        done();
-                    })
-                });
+            addNewUserWorker.on('done', (returnObject) => {
 
-                addNewUserWorker.on('error', (addNewUserError) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        fail(addNewUserError);
-                        done();
-                    })
-                })
-                addNewUserWorker.perform('cmdAddNewUser', paramContext);
+
+                expect(returnObject.groupId).toEqual(insertedFirstGroup.groupId);
+                expect(returnObject.email).toEqual('surenr@99x.lk');
+                done();
+
             });
+
+            addNewUserWorker.on('error', (addNewUserError) => {
+                fail(addNewUserError);
+                done();
+            })
+            addNewUserWorker.perform('cmdAddNewUser', paramContext);
+
         });
     });
 
@@ -176,110 +159,91 @@ describe('Test User Group and Users Related Services', () => {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
             let userSchema = require('../libs/domain/users');
-            dbService.connect(CONNECTION_STRING);
-            const db = dbService.connection;
-            db.on('error', () => {
-                throw new Error('Connection Error');
-            });
-            db.once('open', () => {
-                let paramContext = {
-                    payload: newUserData,
-                    dbService: dbService,
-                    userGroupSchema: userGroupSchema,
-                    userSchema: userSchema,
-                }
 
-                addNewUserWorker.on('done', (returnObject) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        fail('Test Successful when it should fail');
-                        done();
-                    })
-                });
+            let paramContext = {
+                payload: newUserData,
+                dbService: dbService,
+                userGroupSchema: userGroupSchema,
+                userSchema: userSchema,
+            }
 
-                addNewUserWorker.on('error', (errorAddUser) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        expect(errorAddUser).toEqual(jasmine.any(Error));
-                        done();
-                    })
-                })
-                addNewUserWorker.perform('cmdAddNewUser', paramContext);
+            addNewUserWorker.on('done', (returnObject) => {
+                fail('Test Successful when it should fail');
+                done();
             });
+
+            addNewUserWorker.on('error', (errorAddUser) => {
+                expect(errorAddUser).toEqual(jasmine.any(Error));
+                done();
+            })
+            addNewUserWorker.perform('cmdAddNewUser', paramContext);
+
         });
 
         it('Attempting to add a user with invalid email will throw an error', function (done) {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
             let userSchema = require('../libs/domain/users');
-            dbService.connect(CONNECTION_STRING);
-            const db = dbService.connection;
-            db.on('error', () => {
-                throw new Error('Connection Error');
-            });
-            newUserData.email = 'skdsllsldks';
-            db.once('open', () => {
-                let paramContext = {
-                    payload: newUserData,
-                    dbService: dbService,
-                    userGroupSchema: userGroupSchema,
-                    userSchema: userSchema,
-                }
 
-                addNewUserWorker.on('done', (returnObject) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        fail('Test Successful when it should fail');
-                        done();
-                    })
-                });
+            let paramContext = {
+                payload: {
+                    userId: uuidv4(),
+                    groupId: uuidv4(),
+                    email: 'sureas.lk',
+                    entityId: uuidv4(),
+                    firstName: 'Suren',
+                    lastName: 'Rodrigo',
+                    password: 'intel@123',
+                },
+                dbService: dbService,
+                userGroupSchema: userGroupSchema,
+                userSchema: userSchema,
+            }
 
-                addNewUserWorker.on('error', (errorAddUser) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        expect(errorAddUser.errors['email'].message).toEqual('InvalidEmail');
-                        done();
-                    })
-                })
-                addNewUserWorker.perform('cmdAddNewUser', paramContext);
+            addNewUserWorker.on('done', (returnObject) => {
+                fail('Test Successful when it should fail');
+                done();
             });
+
+            addNewUserWorker.on('error', (errorAddUser) => {
+                expect(errorAddUser.errors['email'].message).toEqual('InvalidEmail');
+                done();
+            })
+            addNewUserWorker.perform('cmdAddNewUser', paramContext);
+
         });
 
         it('Attempting to add a user with empty email will throw an error', function (done) {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
             let userSchema = require('../libs/domain/users');
-            dbService.connect(CONNECTION_STRING);
-            const db = dbService.connection;
-            db.on('error', () => {
-                throw new Error('Connection Error');
-            });
-            newUserData.email = '';
-            db.once('open', () => {
-                let paramContext = {
-                    payload: newUserData,
-                    dbService: dbService,
-                    userGroupSchema: userGroupSchema,
-                    userSchema: userSchema,
-                }
 
-                addNewUserWorker.on('done', (returnObject) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        fail('Test Successful when it should fail');
-                        done();
-                    })
-                });
+            let paramContext = {
+                payload: {
+                    userId: uuidv4(),
+                    groupId: uuidv4(),
+                    email: '',
+                    entityId: uuidv4(),
+                    firstName: 'Suren',
+                    lastName: 'Rodrigo',
+                    password: 'intel@123',
+                },
+                dbService: dbService,
+                userGroupSchema: userGroupSchema,
+                userSchema: userSchema,
+            }
 
-                addNewUserWorker.on('error', (errorAddUser) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        expect(errorAddUser.errors['email'].message).toEqual('NoEmail');
-                        done();
-                    })
-                })
-                addNewUserWorker.perform('cmdAddNewUser', paramContext);
+            addNewUserWorker.on('done', (returnObject) => {
+                fail('Test Successful when it should fail');
+                done();
             });
+
+            addNewUserWorker.on('error', (errorAddUser) => {
+                expect(errorAddUser.errors['email'].message).toEqual('NoEmail');
+                done();
+            })
+            addNewUserWorker.perform('cmdAddNewUser', paramContext);
+
         })
     });
 
@@ -292,31 +256,25 @@ describe('Test User Group and Users Related Services', () => {
         it('Add a new group so that we can add users', (done) => {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
-            dbService.connect(CONNECTION_STRING);
-            const db = dbService.connection;
             newGroupData.groupId = uuidv4();
             newGroupData.groupName = "Clark";
 
-            db.on('error', () => {
-                throw new Error('Connection Error');
-            });
-            db.once('open', () => {
-                let paramContext = {
-                    payload: newGroupData,
-                    dbService: dbService,
-                    userGroupSchema: userGroupSchema
-                }
 
-                addNewGroupWorker.on('done', (returnObject) => {
+            let paramContext = {
+                payload: newGroupData,
+                dbService: dbService,
+                userGroupSchema: userGroupSchema
+            }
 
-                    db.close((error) => {
-                        if (error) throw error;
-                        insertedSecondGroup = returnObject;
-                        done();
-                    })
-                })
-                addNewGroupWorker.perform('cmdAddNewGroup', paramContext);
-            });
+            addNewGroupWorker.on('done', (returnObject) => {
+
+
+                insertedSecondGroup = returnObject;
+                done();
+
+            })
+            addNewGroupWorker.perform('cmdAddNewGroup', paramContext);
+
         });
 
         it('Add a new user to the group', (done) => {
@@ -327,77 +285,62 @@ describe('Test User Group and Users Related Services', () => {
             newUserData.entityId = insertedSecondGroup.entityId;
             newUserData.email = 'kamal@gmail.com';
 
-            dbService.connect(CONNECTION_STRING);
-            const db = dbService.connection;
-            db.on('error', () => {
-                throw new Error('Connection Error');
-            });
-            db.once('open', () => {
-                let paramContext = {
-                    payload: newUserData,
-                    dbService: dbService,
-                    userGroupSchema: userGroupSchema,
-                    userSchema: userSchema,
-                }
+            let paramContext = {
+                payload: newUserData,
+                dbService: dbService,
+                userGroupSchema: userGroupSchema,
+                userSchema: userSchema,
+            }
 
-                addNewUserWorker.on('done', (returnObject) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        expect(returnObject.groupId).toEqual(insertedSecondGroup.groupId);
-                        expect(returnObject.email).toEqual('kamal@gmail.com');
-                        insertedUserData = returnObject;
-                        done();
-                    })
-                });
+            addNewUserWorker.on('done', (returnObject) => {
 
-                addNewUserWorker.on('error', (addNewUserError) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        fail(addNewUserError);
-                        done();
-                    })
-                })
-                addNewUserWorker.perform('cmdAddNewUser', paramContext);
+                expect(returnObject.groupId).toEqual(insertedSecondGroup.groupId);
+                expect(returnObject.email).toEqual('kamal@gmail.com');
+                insertedUserData = returnObject;
+                done();
+
             });
+
+            addNewUserWorker.on('error', (addNewUserError) => {
+
+                fail(addNewUserError);
+                done();
+
+            })
+            addNewUserWorker.perform('cmdAddNewUser', paramContext);
+
         });
 
         it('Update user information for a given user under an existing group', (done) => {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
             let userSchema = require('../libs/domain/users');
-            dbService.connect(CONNECTION_STRING);
-            const db = dbService.connection;
-            db.on('error', () => {
-                throw new Error('Connection Error');
-            });
-            db.once('open', () => {
-                let paramContext = {
-                    id: insertedUserData._id,
-                    payload: userToUpdate,
-                    dbService: dbService,
-                    userGroupSchema: userGroupSchema,
-                    userSchema: userSchema,
-                }
 
-                updateUserWorker.on('done', (returnObject) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        expect(returnObject.firstName).toEqual('Kamal');
-                        expect(returnObject.lastName).toEqual('Perera');
-                        insertedUserData = returnObject;
-                        done();
-                    })
-                });
+            let paramContext = {
+                id: insertedUserData._id,
+                payload: userToUpdate,
+                dbService: dbService,
+                userGroupSchema: userGroupSchema,
+                userSchema: userSchema,
+            }
 
-                updateUserWorker.on('error', (updateUserError) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        fail(updateUserError);
-                        done();
-                    })
-                })
-                updateUserWorker.perform('cmdUpdateUser', paramContext);
+            updateUserWorker.on('done', (returnObject) => {
+
+                expect(returnObject.firstName).toEqual('Kamal');
+                expect(returnObject.lastName).toEqual('Perera');
+                insertedUserData = returnObject;
+                done();
+
             });
+
+            updateUserWorker.on('error', (updateUserError) => {
+
+                fail(updateUserError);
+                done();
+
+            })
+            updateUserWorker.perform('cmdUpdateUser', paramContext);
+
         });
 
         it('Update user group under the same company', (done) => {
@@ -406,38 +349,31 @@ describe('Test User Group and Users Related Services', () => {
             let userSchema = require('../libs/domain/users');
             userToUpdate.groupId = insertedFirstGroup.groupId;
             userToUpdate.entityId = insertedFirstGroup.entityId;
-            dbService.connect(CONNECTION_STRING);
-            const db = dbService.connection;
-            db.on('error', () => {
-                throw new Error('Connection Error');
-            });
-            db.once('open', () => {
-                let paramContext = {
-                    id: insertedUserData._id,
-                    payload: userToUpdate,
-                    dbService: dbService,
-                    userGroupSchema: userGroupSchema,
-                    userSchema: userSchema,
-                }
 
-                updateUserWorker.on('done', (returnObject) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        expect(returnObject.groupId).toEqual(insertedFirstGroup.groupId);
-                        insertedUserData = returnObject;
-                        done();
-                    })
-                });
+            let paramContext = {
+                id: insertedUserData._id,
+                payload: userToUpdate,
+                dbService: dbService,
+                userGroupSchema: userGroupSchema,
+                userSchema: userSchema,
+            }
 
-                updateUserWorker.on('error', (updateUserError) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        fail(updateUserError);
-                        done();
-                    })
-                })
-                updateUserWorker.perform('cmdUpdateUser', paramContext);
+            updateUserWorker.on('done', (returnObject) => {
+
+                expect(returnObject.groupId).toEqual(insertedFirstGroup.groupId);
+                insertedUserData = returnObject;
+                done();
+
             });
+
+            updateUserWorker.on('error', (updateUserError) => {
+
+                fail(updateUserError);
+                done();
+
+            })
+            updateUserWorker.perform('cmdUpdateUser', paramContext);
+
         });
 
         it('People can login to the system', (done) => {
@@ -447,38 +383,30 @@ describe('Test User Group and Users Related Services', () => {
             let activeUserSchema = require('../libs/domain/loggedInUser');
 
 
-            dbService.connect(CONNECTION_STRING);
-            const db = dbService.connection;
-            db.on('error', () => {
-                throw new Error('Connection Error');
-            });
-            db.once('open', () => {
-                let paramContext = {
-                    email: insertedUserData.email,
-                    password: 'intel@123',
-                    dbService: dbService,
-                    userGroupSchema: userGroupSchema,
-                    userSchema: userSchema,
-                    activeUserSchema: activeUserSchema,
-                };
-                userLoginWorker.on('done', (activeUserObject) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        expect(activeUserObject.token).not.toBeNull();
-                        expect(activeUserObject.validTill - activeUserObject.generatedOn).toEqual(1800000);
-                        done();
-                    })
-                });
+            let paramContext = {
+                email: insertedUserData.email,
+                password: 'intel@123',
+                dbService: dbService,
+                userGroupSchema: userGroupSchema,
+                userSchema: userSchema,
+                activeUserSchema: activeUserSchema,
+            };
+            userLoginWorker.on('done', (activeUserObject) => {
 
-                userLoginWorker.on('error', (activeUserError) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        fail(activeUserError);
-                        done();
-                    });
-                });
-                userLoginWorker.perform('cmdLoginUser', paramContext);
+                expect(activeUserObject.token).not.toBeNull();
+                expect(activeUserObject.validTill - activeUserObject.generatedOn).toEqual(1800000);
+                done();
+
             });
+
+            userLoginWorker.on('error', (activeUserError) => {
+
+                fail(activeUserError);
+                done();
+
+            });
+            userLoginWorker.perform('cmdLoginUser', paramContext);
+
         });
 
         it('invalid credentials will throw an error', (done) => {
@@ -486,45 +414,30 @@ describe('Test User Group and Users Related Services', () => {
             let userGroupSchema = require('../libs/domain/user-group');
             let userSchema = require('../libs/domain/users');
             let activeUserSchema = require('../libs/domain/loggedInUser');
+            let paramContext = {
+                email: insertedUserData.email,
+                password: 'kdkdk@123',
+                dbService: dbService,
+                userGroupSchema: userGroupSchema,
+                userSchema: userSchema,
+                activeUserSchema: activeUserSchema,
+            };
+            userLoginWorker.on('done', (activeUserObject) => {
 
+                fail('Invalid users were allowed to login');
+                done();
 
-            dbService.connect(CONNECTION_STRING);
-            const db = dbService.connection;
-            db.on('error', () => {
-                throw new Error('Connection Error');
             });
-            db.once('open', () => {
-                let paramContext = {
-                    email: insertedUserData.email,
-                    password: 'kdkdk@123',
-                    dbService: dbService,
-                    userGroupSchema: userGroupSchema,
-                    userSchema: userSchema,
-                    activeUserSchema: activeUserSchema,
-                };
-                userLoginWorker.on('done', (activeUserObject) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        fail('Invalid users were allowed to login');
-                        done();
-                    })
-                });
 
-                userLoginWorker.on('error', (activeUserError) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        console.log('on error call', activeUserError.message ==='InvalidCredentials');
-                        expect(activeUserError.message).toEqual('InvalidCredentials');
-                        done();
-                    });
-                });
-                userLoginWorker.perform('cmdLoginUser', paramContext);
+            userLoginWorker.on('error', (activeUserError) => {
+
+                console.log('on error call', activeUserError.message === 'InvalidCredentials');
+                expect(activeUserError.message).toEqual('InvalidCredentials');
+                done();
+
             });
+            userLoginWorker.perform('cmdLoginUser', paramContext);
+
         });
     });
-
-
-
-
-
 });

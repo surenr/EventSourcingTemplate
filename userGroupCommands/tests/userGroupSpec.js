@@ -94,35 +94,25 @@ describe('Test User Group and Users Related Services', () => {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
 
-            dbService.connect(CONNECTION_STRING);
-            const db = dbService.connection;
-            db.on('error', () => {
-                throw new Error('Connection Error');
-            });
-            db.once('open', () => {
-                let paramContext = {
-                    payload: {
-                        groupId: '',
-                        groupName: 'Manager',
-                        entityId: uuidv4(),
-                        allowedActions: ['Transaction:*', 'Documents:*', 'Buyer:*', 'Seller:*'],
+            let paramContext = {
+                payload: {
+                    groupId: '',
+                    groupName: 'Manager',
+                    entityId: uuidv4(),
+                    allowedActions: ['Transaction:*', 'Documents:*', 'Buyer:*', 'Seller:*'],
 
-                    },
-                    dbService: dbService,
-                    userGroupSchema: userGroupSchema
-                }
+                },
+                dbService: dbService,
+                userGroupSchema: userGroupSchema
+            }
 
-                addNewGroupWorker.on('error', (returnObject) => {
-
-                    db.close((error) => {
-                        if (error) throw error;
-                        expect(returnObject.errors['groupId'].message).toEqual('NoGroupId');
-                        done();
-                    })
-                })
-
-                addNewGroupWorker.perform('cmdAddNewGroup', paramContext);
+            addNewGroupWorker.on('error', (returnObject) => {
+                expect(returnObject.errors['groupId'].message).toEqual('NoGroupId');
+                done();
             })
+
+            addNewGroupWorker.perform('cmdAddNewGroup', paramContext);
+
 
 
         });
@@ -131,97 +121,61 @@ describe('Test User Group and Users Related Services', () => {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
 
-            dbService.connect(CONNECTION_STRING);
-            const db = dbService.connection;
-            db.on('error', () => {
-                throw new Error('Connection Error');
-            });
-            db.once('open', () => {
-                let paramContext = {
-                    payload: newGroupData,
-                    dbService: dbService,
-                    userGroupSchema: userGroupSchema
-                }
-
-                addNewGroupWorker.on('done', (returnObject) => {
-
-                    db.close((error) => {
-                        if (error) throw error;
-                        expect(returnObject).toBeTruthy();
-                        done();
-                    })
-                })
-                addNewGroupWorker.perform('cmdAddNewGroup', paramContext);
+            let paramContext = {
+                payload: newGroupData,
+                dbService: dbService,
+                userGroupSchema: userGroupSchema
+            }
+            addNewGroupWorker.on('done', (returnObject) => {
+                expect(returnObject).toBeTruthy();
+                done();
             })
-
-
+            addNewGroupWorker.perform('cmdAddNewGroup', paramContext);
         });
 
         describe('Test Adding Existing Records will be rejected', function () {
             it('Adding the First Test Success', (done) => {
                 let dbService = require('mongoose');
                 let userGroupSchema = require('../libs/domain/user-group');
-                dbService.connect(CONNECTION_STRING);
-                const db = dbService.connection;
-                db.on('error', () => {
-                    throw new Error('Connection Error');
-                });
-                db.once('open', () => {
-                    let paramContext = {
-                        payload: {
-                            groupId: uuidv4(),
-                            groupName: 'Manager',
-                            entityId: 12345,
-                            allowedActions: ['Transaction:*', 'Documents:*', 'Buyer:*', 'Seller:*'],
-
-                        },
-                        dbService: dbService,
-                        userGroupSchema: userGroupSchema
-                    }
-                    addNewGroupWorker.on('done', (returnObj) => {
-                        db.close((error) => {
-                            if (error) throw error;
-                            expect(returnObj.entityId).toEqual("12345");
-                            done()
-                        })
-                    })
-                    addNewGroupWorker.perform('cmdAddNewGroup', paramContext);
-                });
+                let paramContext = {
+                    payload: {
+                        groupId: uuidv4(),
+                        groupName: 'Manager',
+                        entityId: 12345,
+                        allowedActions: ['Transaction:*', 'Documents:*', 'Buyer:*', 'Seller:*'],
+                    },
+                    dbService: dbService,
+                    userGroupSchema: userGroupSchema
+                }
+                addNewGroupWorker.on('done', (returnObj) => {
+                    expect(returnObj.entityId).toEqual("12345");
+                    done();
+                })
+                addNewGroupWorker.perform('cmdAddNewGroup', paramContext);
             });
 
             it('Adding Existing User groups under the same entity will throw an error', (done) => {
                 let dbService = require('mongoose');
                 let userGroupSchema = require('../libs/domain/user-group');
-                dbService.connect(CONNECTION_STRING);
-                const db = dbService.connection;
-                db.on('error', () => {
-                    throw new Error('Connection Error');
-                });
-                db.once('open', () => {
-                    let paramContext = {
-                        payload: {
-                            groupId: uuidv4(),
-                            groupName: 'Manager',
-                            entityId: 12345,
-                            allowedActions: ['Transaction:*', 'Documents:*', 'Buyer:*', 'Seller:*'],
 
-                        },
-                        dbService: dbService,
-                        userGroupSchema: userGroupSchema
-                    }
-                    addNewGroupWorker.on('error', (performError) => {
-                        db.close((error) => {
-                            if (error) throw error;
-                            expect(true).toEqual(true);
-                            done()
-                        })
-                    })
-                    addNewGroupWorker.perform('cmdAddNewGroup', paramContext);
-                });
+                let paramContext = {
+                    payload: {
+                        groupId: uuidv4(),
+                        groupName: 'Manager',
+                        entityId: 12345,
+                        allowedActions: ['Transaction:*', 'Documents:*', 'Buyer:*', 'Seller:*'],
+
+                    },
+                    dbService: dbService,
+                    userGroupSchema: userGroupSchema
+                }
+                addNewGroupWorker.on('error', (performError) => {
+                    expect(true).toEqual(true);
+                    done();
+                })
+                addNewGroupWorker.perform('cmdAddNewGroup', paramContext);
             });
-
         });
-
     });
 
     describe('Test Updating an existing group', function () {
@@ -241,62 +195,36 @@ describe('Test User Group and Users Related Services', () => {
         it('Adding the new group', function (done) {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
-            dbService.connect(CONNECTION_STRING);
-            const db = dbService.connection;
-            db.on('error', () => {
-                throw new Error('Connection Error');
-            });
 
-            db.once('open', () => {
-                let paramContext = {
-                    payload: newGroup,
-                    dbService: dbService,
-                    userGroupSchema: userGroupSchema
-                }
+            let paramContext = {
+                payload: newGroup,
+                dbService: dbService,
+                userGroupSchema: userGroupSchema
+            }
 
-                addNewGroupWorker.on('done', (returnObj) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        expect(returnObj.groupName).toEqual("Clark");
-                        groupToUpdate = returnObj;
-                        done()
-                    })
-                })
-                addNewGroupWorker.perform('cmdAddNewGroup', paramContext);
-            });
+            addNewGroupWorker.on('done', (returnObj) => {
+                expect(returnObj.groupName).toEqual("Clark");
+                groupToUpdate = returnObj;
+                done();
+            })
+            addNewGroupWorker.perform('cmdAddNewGroup', paramContext);
         });
 
         it('Update the group', function (done) {
             let dbService = require('mongoose');
             let userGroupSchema = require('../libs/domain/user-group');
-            dbService.connect(CONNECTION_STRING);
-            const db = dbService.connection;
-            db.on('error', () => {
-                throw new Error('Connection Error');
-            });
-
-            db.once('open', () => {
-                let paramContext = {
-                    id: groupToUpdate._id,
-                    payload: updatePayload,
-                    dbService: dbService,
-                    userGroupSchema: userGroupSchema
-                }
-
-                updateUserGroupWorker.on('done', (returnObj) => {
-                    db.close((error) => {
-                        if (error) throw error;
-                        expect(returnObj.groupName).toEqual("Manager");
-                        expect(returnObj.allowedActions.length).toEqual(4);
-                        done()
-                    })
-                })
-                updateUserGroupWorker.perform('cmdUpdateGroup', paramContext);
-            });
+            let paramContext = {
+                id: groupToUpdate._id,
+                payload: updatePayload,
+                dbService: dbService,
+                userGroupSchema: userGroupSchema
+            }
+            updateUserGroupWorker.on('done', (returnObj) => {
+                expect(returnObj.groupName).toEqual("Manager");
+                expect(returnObj.allowedActions.length).toEqual(4);
+                done();
+            })
+            updateUserGroupWorker.perform('cmdUpdateGroup', paramContext);
         });
-
-
-    })
-
-
+    });
 });

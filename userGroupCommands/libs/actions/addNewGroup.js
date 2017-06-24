@@ -27,31 +27,35 @@
     });
   }
   AddNewGroupAction.prototype.doWork = function (params) {
-    const dbService = params.dbService;
-    const userGroupSchema = params.userGroupSchema;
-    const payload = params.payload;
     return new Promise((resolve, reject) => {
-      if (payload) {
-        const UserGroupModel = dbService.model('UserGroups', userGroupSchema);
+      try {
+        const dbService = params.dbService;
+        const userGroupSchema = params.userGroupSchema;
+        const payload = params.payload;
+        if (payload) {
+          const UserGroupModel = dbService.model('UserGroups', userGroupSchema);
 
-        const newUserGroup = new UserGroupModel({
-          groupId: payload.groupId,
-          groupName: payload.groupName,
-          entityId: payload.entityId,
-          allowedActions: payload.allowedActions,
-        });
-        customValidate(newUserGroup, UserGroupModel, payload).then(() => {
-          newUserGroup.save((error, userGroup) => {
-            if (error) {
-              reject(error);
-            }
-            resolve(userGroup);
+          const newUserGroup = new UserGroupModel({
+            groupId: payload.groupId,
+            groupName: payload.groupName,
+            entityId: payload.entityId,
+            allowedActions: payload.allowedActions,
           });
-        }, (error) => {
-          reject(error);
-        }).catch((error) => { reject(error); });
-      } else {
-        throw new Error('Payload Empty');
+          customValidate(newUserGroup, UserGroupModel, payload).then(() => {
+            newUserGroup.save((error, userGroup) => {
+              if (error) {
+                reject(error);
+              }
+              resolve(userGroup);
+            });
+          }, (error) => {
+            reject(error);
+          }).catch((error) => { reject(error); });
+        } else {
+          throw new Error('Payload Empty');
+        }
+      } catch (generalErrors) {
+        throw generalErrors;
       }
     });
   };
