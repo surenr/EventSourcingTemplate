@@ -4,12 +4,13 @@ describe('Test User Group and Users Related Services', () => {
     const UpdateUserGroup = require('../libs/actions/updateNewGroup');
     const uuidv4 = require('uuid/v4');
     const util = require('util');
-    const CONNECTION_STRING = 'mongodb://usrtradeitdb:tradeituserPa$$wd@SG-TradeIT-10478.servers.mongodirector.com:27017/tradeit';
+    const sysConfig = require('../commonServices/configService');
+    const CONNECTION_STRING = sysConfig.DB.CONNECTION_STRING_TESTS;
     let addNewGroupWorker;
     let updateUserGroupWorker;
     beforeEach(function (done) {
-        addNewGroupWorker = new AddNewGroupAction();
-        updateUserGroupWorker = new UpdateUserGroup()
+        addNewGroupWorker = new AddNewGroupAction(sysConfig.ACTION_TYPES.COMMAND_TEST);
+        updateUserGroupWorker = new UpdateUserGroup(sysConfig.ACTION_TYPES.COMMAND_TEST)
         done();
     });
 

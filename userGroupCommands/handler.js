@@ -1,11 +1,10 @@
 
 const dbService = require('mongoose');
-const uuidv4 = require('uuid/v4');
-const util = require('util');
 const userSchema = require('./libs/domain/users');
 const userGroupSchema = require('./libs/domain/user-group');
 const activeUserSchema = require('./libs/domain/loggedInUser');
 const sysConfig = require('./commonServices/configService');
+const handler = require('./commonServices/eventHandler');
 
 const getParamContext = (eventObj) => {
   switch (eventObj.command) {
@@ -47,7 +46,7 @@ const getParamContext = (eventObj) => {
         payload: eventObj.payload,
       };
     default:
-      throw new Error('Invalid command comde');
+      throw new Error('Invalid command code');
   }
 };
 
@@ -59,49 +58,12 @@ module.exports.userGroupCommandHandler = (event, context, callback) => {
   const UpdateUserGroup = require('./libs/actions/updateNewGroup');
 
   const workerInstances = [
-    new AddNewUserAction(),
-    new AddNewGroupAction(),
-    new UpdateUserAction(),
-    new UpdateUserGroup(),
+    new AddNewUserAction(sysConfig.ACTION_TYPES.COMMAND),
+    new AddNewGroupAction(sysConfig.ACTION_TYPES.COMMAND),
+    new UpdateUserAction(sysConfig.ACTION_TYPES.COMMAND),
+    new UpdateUserGroup(sysConfig.ACTION_TYPES.COMMAND),
     // Add all the worker instance here.
   ];
-  const eventRecords = event.Records;
-  eventRecords.forEach((eventElement) => {
-    const eventObject = JSON.parse(eventElement.Sns.Message);
-    const eventActionCommand = eventObject.command;
-    if (!eventActionCommand) callback(new Error('Event Command Not Found.'), null);
-    workerInstances.map((worker) => {
-      dbService.connect(sysConfig.DB.CONNECTION_STRING);
-      const db = dbService.connection;
-      db.on('error', () => {
-        throw new Error('Connection Error');
-      });
-      
-      db.once('open', () => {
-        worker.on('reject', (commandCode) => {
-          db.close((error) => {
-            if (error) throw error;
-            console.log(`Worker rejected the command code ${commandCode}`);
-          });
-        });
-
-        worker.on('error', (error) => {
-          db.close((dbCloseError) => {
-            if (dbCloseError) throw dbCloseError;
-            callback(error, null);
-          });
-        });
-
-        worker.on('done', (response) => {
-          db.close((dbCloseError) => {
-            if (dbCloseError) throw dbCloseError;
-            callback(null, response);
-          });
-        });
-
-        const paramContext = getParamContext(eventObject);
-        worker.perform(eventActionCommand, paramContext);
-      });
-    });
-  });
+  handler.commonEventHandler(event, context, workerInstances, getParamContext, callback);
 };
+

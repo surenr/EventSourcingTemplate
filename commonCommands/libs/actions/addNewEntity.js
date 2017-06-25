@@ -2,8 +2,8 @@
   const util = require('util');
   const baseAction = require('../../commonServices/baseAction');
   const sysConfig = require('../../commonServices/configService');
-  function AddNewGroupAction(type) {
-    this.ActionName = 'cmdAddNewGroup';
+  function AddNewEntity(type) {
+    this.ActionName = 'cmdAddNewEntity';
     this.ActionType = type || sysConfig.ACTION_TYPES.COMMAND;
     switch (this.ActionType) {
       case sysConfig.ACTION_TYPES.COMMAND:
@@ -16,20 +16,20 @@
         this.CONNECTION_STRING = sysConfig.DB.CONNECTION_STRING;
     }
   }
-  util.inherits(AddNewGroupAction, baseAction);
+  util.inherits(AddNewEntity, baseAction);
 
-  function customValidate(userGroupInstance, userGroupModel, payload) {
+  function customValidate(entityInstance, entityModel, payload) {
     return new Promise((resolve, reject) => {
-      const generalValidationErrors = userGroupInstance.validateSync();
+      const generalValidationErrors = entityInstance.validateSync();
       if (generalValidationErrors) {
         reject(generalValidationErrors);
       } else {
-        userGroupModel.find({ entityId: payload.entityId, groupName: payload.groupName },
+        entityModel.find({ entityId: payload.entityId },
           (err, docs) => {
             if (err) reject(err);
 
             if (docs.length > 0) {
-              reject(new Error(`Group "${payload.groupName}" Already Exists.`));
+              reject(new Error(`Entity "${payload.name}" Already Exists.`));
             } else {
               resolve();
             }
@@ -37,23 +37,25 @@
       }
     });
   }
-  AddNewGroupAction.prototype.doWork = function (params) {
+  AddNewEntity.prototype.doWork = function (params) {
     return new Promise((resolve, reject) => {
       try {
         const dbService = params.dbService;
-        const userGroupSchema = params.userGroupSchema;
+        const entitySchema = params.entitySchema;
         const payload = params.payload;
         if (payload) {
-          const UserGroupModel = dbService.model('UserGroups', userGroupSchema);
+          const EntityModel = dbService.model('Entity', entitySchema);
 
-          const newUserGroup = new UserGroupModel({
-            groupId: payload.groupId,
-            groupName: payload.groupName,
+          const newEntity = new EntityModel({
             entityId: payload.entityId,
-            allowedActions: payload.allowedAction,
+            type: payload.type,
+            name: payload.name,
+            registered_date: payload.registered_date,
+            registration_number: payload.registration_number,
+            country: payload.country,
           });
-          customValidate(newUserGroup, UserGroupModel, payload).then(() => {
-            newUserGroup.save((error, userGroup) => {
+          customValidate(newEntity, EntityModel, payload).then(() => {
+            newEntity.save((error, userGroup) => {
               if (error) {
                 reject(error);
               }
@@ -70,5 +72,5 @@
       }
     });
   };
-  module.exports = AddNewGroupAction;
+  module.exports = AddNewEntity;
 }());

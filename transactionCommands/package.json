@@ -12,8 +12,9 @@
   "author": "Suren Rodrigo",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^1.0.2",
+    "md5": "^2.2.1",
     "mongoose": "^4.10.8",
-    "uuid": "^3.1.0"
+    "uuid": "^3.1.0",
+    "validator": "^7.1.0"
   }
 }

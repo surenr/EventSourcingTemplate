@@ -4,7 +4,8 @@ describe('Test User Group and Users Related Services', () => {
     const AddNewGroupAction = require('../libs/actions/addNewGroup');
     const UpdateUserAction = require('../libs/actions/updateNewUser');
     const UserLoginAction = require('../libs/actions/loginUser');
-    const CONNECTION_STRING = 'mongodb://usrtradeitdb:tradeituserPa$$wd@SG-TradeIT-10478.servers.mongodirector.com:27017/tradeit';
+    const sysConfig = require('../commonServices/configService');
+    const CONNECTION_STRING = sysConfig.DB.CONNECTION_STRING_TESTS;
     const uuidv4 = require('uuid/v4');
     const util = require('util');
     let addNewUserWorker;
@@ -13,10 +14,10 @@ describe('Test User Group and Users Related Services', () => {
     let userLoginWorker;
 
     beforeEach(function (done) {
-        addNewUserWorker = new AddNewUserAction();
-        addNewGroupWorker = new AddNewGroupAction();
-        updateUserWorker = new UpdateUserAction();
-        userLoginWorker = new UserLoginAction();
+        addNewUserWorker = new AddNewUserAction(sysConfig.ACTION_TYPES.COMMAND_TEST);
+        addNewGroupWorker = new AddNewGroupAction(sysConfig.ACTION_TYPES.COMMAND_TEST);
+        updateUserWorker = new UpdateUserAction(sysConfig.ACTION_TYPES.COMMAND_TEST);
+        userLoginWorker = new UserLoginAction(sysConfig.ACTION_TYPES.COMMAND_TEST);
         done();
     });
 
@@ -161,7 +162,15 @@ describe('Test User Group and Users Related Services', () => {
             let userSchema = require('../libs/domain/users');
 
             let paramContext = {
-                payload: newUserData,
+                payload: {
+                    userId: uuidv4(),
+                    groupId: uuidv4(),
+                    email: 'surenr@99x.lk',
+                    entityId: uuidv4(),
+                    firstName: 'Suren',
+                    lastName: 'Rodrigo',
+                    password: 'intel@123',
+                },
                 dbService: dbService,
                 userGroupSchema: userGroupSchema,
                 userSchema: userSchema,

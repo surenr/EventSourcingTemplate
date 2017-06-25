@@ -40,9 +40,14 @@ gulp.task('Deploy transaction commands', shell.task([
 //     '"./node_modules/.bin/jasmine-node" commonCommands/ commonServices/ userGroupCommands/ transactionCommands/ --color --verbose --junitreport --output reports'
 // ], { cwd: '.' }));
 
-gulp.task('Test Services',['copy common services'], function () {
+gulp.task('test_common_services', ['copy common services'], function () {
+    return gulp.src(['commonCommands/tests/**/*.js'])
+        .pipe(jasmine({ verbose: true, includeStackTrace: true }));
+});
+
+gulp.task('Test Services', ['copy common services'], function () {
     return gulp.src(['commonCommands/tests/**/*.js', 'commonServices/tests/**/*.js', 'userGroupCommands/tests/**/*.js', 'transactionCommands/tests/**/*.js'])
-        .pipe(jasmine({verbose:true, includeStackTrace: true}));
+        .pipe(jasmine({ verbose: true, includeStackTrace: true }));
 });
 
 gulp.task('test-watch', function () {

@@ -1,5 +1,44 @@
 const AWS = require('aws-sdk');
+const dbService = require('mongoose');
+const uuidv4 = require('uuid/v4');
+const handler = require('./commonServices/eventHandler');
+const omitEmpty = require('omit-empty');
+const parse = AWS.DynamoDB.Converter.output;
 const sysConfig = require('./commonServices/configService');
+const entitySchema = require('./libs/domain/entities.js');
+
+const getParamContext = (eventObj) => {
+  switch (eventObj.command) {
+    case 'cmdAddNewEntity':
+      const payload = eventObj.payload;
+      payload.entityId = uuidv4();
+      return {
+        payload,
+        dbService,
+        entitySchema,
+      };
+    case 'cmdUpdateEntity':
+      return {
+        id: eventObj.id,
+        dbService,
+        entitySchema,
+        payload: eventObj.payload,
+      };
+    default:
+      throw new Error('Invalid command code');
+  }
+};
+
+module.exports.entityCommandHandler = (event, context, callback) => {
+  const AddNewEntity = require('./libs/actions/addNewEntity');
+  const UpdateEntity = require('./libs/actions/updateEntity');
+
+  const workerInstances = [
+    new AddNewEntity(sysConfig.ACTION_TYPES.COMMAND),
+    new UpdateEntity(sysConfig.ACTION_TYPES.COMMAND),
+  ];
+  handler.commonEventHandler(event, context, workerInstances, getParamContext, callback);
+};
 
 module.exports.commandHandler = (event, context, callback) => {
   if (event.path === '/tradeit/command') {
@@ -21,16 +60,19 @@ module.exports.commandHandler = (event, context, callback) => {
     const eventDateTime = new Date();
     const eventSequenceId = eventDateTime.getTime();
 
-    const params = {
+    let params = {
       TableName: table,
       Item: {
         sequence: eventSequenceId,
         issuedOn: eventDateTime.toString(),
-        commandName: eventData.commandName,
-        commandCode: eventData.commandCode,
+        commandName: eventData.commandName ? eventData.commandName : '',
+        commandCode: eventData.commandCode ? eventData.commandCode : '',
+        id: eventData.id ? eventData.id : '',
         payload: eventData.payload,
       },
     };
+
+    params = omitEmpty(params);
 
     return docClient.put(params, (error) => {
       if (error) {
@@ -56,25 +98,28 @@ module.exports.eventHandler = (event, context, callback) => {
   const eventRecords = event.Records;
   console.log('Event Count: ', eventRecords.length);
   const promiseArray = [];
-  let params = {};
-  eventRecords.forEach((eventElement) => {
-    console.log(eventElement.dynamodb.NewImage.payload);
 
-    console.log(eventElement.dynamodb.NewImage.commandCode);
-    const commandCode = eventElement.dynamodb.NewImage.commandCode.S;
-    const snsSubject = eventElement.dynamodb.NewImage.commandName.S;
+  eventRecords.forEach((eventElement) => {
+    const dynamoDbJsonEvent = parse({ M: eventElement.dynamodb.NewImage });
+    console.log(dynamoDbJsonEvent);
+    console.log(dynamoDbJsonEvent.payload);
+    console.log(dynamoDbJsonEvent.commandCode);
+    const commandCode = dynamoDbJsonEvent.commandCode ? dynamoDbJsonEvent.commandCode : '';
+    const snsSubject = dynamoDbJsonEvent.commandName ? dynamoDbJsonEvent.commandName : '';
+    const id = dynamoDbJsonEvent.id ? dynamoDbJsonEvent.id : '';
     if (!commandCode) throw new Error('Event without command code');
     const snsTopicName = sysConfig.COMMAND_TOPIC_MAP[commandCode];
     if (!snsTopicName) throw new Error(`No Handler found for command ${commandCode}`);
     const snsMessageObject = {
+      id,
       command: commandCode,
-      payload: eventElement.dynamodb.NewImage.payload.M,
+      payload: dynamoDbJsonEvent.payload,
     };
     const snsMessage = JSON.stringify(snsMessageObject);
 
     const snsTopicArn = `${sysConfig.AWS.SNS_BASE_ARN}${snsTopicName}`;
     const sns = new AWS.SNS();
-    params = {
+    const params = {
       Message: snsMessage,
       Subject: snsSubject,
       TopicArn: snsTopicArn,

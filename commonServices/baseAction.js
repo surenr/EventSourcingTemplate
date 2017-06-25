@@ -2,10 +2,10 @@
   const events = require('events');
   const util = require('util');
   const dbService = require('mongoose');
-  const sysConfig = require('./configService');
-
   function BaseAction() {
     this.ActionName = '';
+    this.CONNECTION_STRING = '';
+    this.ActionType = '';
     events.EventEmitter.call(this);
   }
   util.inherits(BaseAction, events.EventEmitter);
@@ -22,7 +22,7 @@
       if (this.ActionName !== commandCode) {
         this.emit('reject', commandCode);
       } else {
-        dbService.connect(sysConfig.DB.CONNECTION_STRING);
+        dbService.connect(this.CONNECTION_STRING);
         const db = dbService.connection;
         db.on('error', () => {
           throw new Error('Connection Error');

@@ -32,8 +32,16 @@ provider:
          Action:
            - "sns:publish"
          Resource: "arn:aws:sns:ap-southeast-2:296927073230:*"
+      -  Effect: "Allow"
+         Action:
+           - "sns:subscribe"
+         Resource: "arn:aws:sns:ap-southeast-2:296927073230:GeneralCommandSNSTopic"
           
 functions:
+  entityCommandHandler:
+    handler: handler.entityCommandHandler
+    events:
+      - sns: arn:aws:sns:ap-southeast-2:296927073230:GeneralCommandSNSTopic
   commandHandler:
     handler: handler.commandHandler
     events: # The Events that trigger this Function
@@ -55,6 +63,11 @@ functions:
 
 resources:  
   Resources:
+    GeneralCommandSNSTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        DisplayName: 'General Common Message Dispacher'
+        TopicName: GeneralCommandSNSTopic
     NotificationSNSTopic:
       Type: "AWS::SNS::Topic"
       Properties:

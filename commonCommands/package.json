@@ -1,7 +1,7 @@
 {
-  "name": "user_group_commands",
+  "name": "common_commands",
   "version": "1.0.0",
-  "description": "User Group Command Service",
+  "description": "CommonCommands Service",
   "main": "handler.js",
   "directories": {
     "test": "tests"
@@ -15,6 +15,7 @@
     "babel-runtime": "^6.23.0",
     "md5": "^2.2.1",
     "mongoose": "^4.10.8",
+    "omit-empty": "^0.4.1",
     "uuid": "^3.1.0",
     "validator": "^7.1.0"
   }

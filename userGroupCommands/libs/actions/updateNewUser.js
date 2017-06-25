@@ -1,9 +1,20 @@
 (function () {
   const util = require('util');
   const baseAction = require('../../commonServices/baseAction');
-
-  function UpdateUserAction() {
+  const sysConfig = require('../../commonServices/configService');
+  function UpdateUserAction(type) {
     this.ActionName = 'cmdUpdateUser';
+    this.ActionType = type || sysConfig.ACTION_TYPES.COMMAND;
+    switch (this.ActionType) {
+      case sysConfig.ACTION_TYPES.COMMAND:
+        this.CONNECTION_STRING = sysConfig.DB.CONNECTION_STRING;
+        break;
+      case sysConfig.ACTION_TYPES.COMMAND_TEST:
+        this.CONNECTION_STRING = sysConfig.DB.CONNECTION_STRING_TESTS;
+        break;
+      default:
+        this.CONNECTION_STRING = sysConfig.DB.CONNECTION_STRING;
+    }
   }
   util.inherits(UpdateUserAction, baseAction);
   UpdateUserAction.prototype.doWork = function (params) {
@@ -11,7 +22,9 @@
       const dbService = params.dbService;
       const userSchema = params.userSchema;
       const groupSchema = params.userGroupSchema;
-      const targetObjectId = params.id;
+      const ObjectId = dbService.Types.ObjectId;
+      const targetObjectId = new ObjectId(params.id);
+
       const payload = params.payload;
       if (payload) {
         const UserModel = dbService.model('Users', userSchema);
