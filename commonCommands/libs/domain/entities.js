@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const EntitySchema = new mongoose.Schema({
+  sequenceId: {
+    type: String,
+    required: [true, 'NoSequenceId'],
+  },
   entityId: {
     type: String,
     required: [true, 'NoEntityId'],

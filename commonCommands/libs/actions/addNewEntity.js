@@ -53,6 +53,7 @@
           const EntityModel = dbService.model('Entity', entitySchema);
 
           const newEntity = new EntityModel({
+            sequenceId: params.sequence,
             entityId: payload.entityId,
             type: payload.type,
             name: payload.name,

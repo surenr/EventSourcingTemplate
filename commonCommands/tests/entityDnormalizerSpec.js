@@ -8,6 +8,7 @@ let entityId = uuidv4();
 let registeredDate = new Date();
 const entityDenormalizerCommandCode = `cmdAddNewEntity${sysConfig.SYSTEM.DENORMALIZER_POSTFIX}`;
 let entityDenorm = new EntityDenormModel({
+    sequenceId: uuidv4(),
     entityId,
     type: 'Company',
     name: 'ABC Company',
@@ -82,7 +83,8 @@ describe('Test the denormalizer workers to ensure they write the data to the que
                     country: 'Sri Lanka'
                 },
                 dbService: dbService,
-                entityDenormSchema: entityDenormalizedSchema
+                entityDenormSchema: entityDenormalizedSchema,
+                sequence: uuidv4(),
             };
 
             entityDenormalizer.on('done', (returnObject) => {
@@ -103,7 +105,8 @@ describe('Test the denormalizer workers to ensure they write the data to the que
             let paramContext = {
                 payload: entityDenorm,
                 dbService: dbService,
-                entityDenormSchema: entityDenormalizedSchema
+                entityDenormSchema: entityDenormalizedSchema,
+                sequence: uuidv4(),
             };
             entityDenormalizer.on('done', (returnObject) => {
 
@@ -128,7 +131,8 @@ describe('Test the denormalizer workers to ensure they write the data to the que
             let paramContext = {
                 payload: lastWrittenEntity,
                 dbService: dbService,
-                entityDenormSchema: entityDenormalizedSchema
+                entityDenormSchema: entityDenormalizedSchema,
+                sequence: uuidv4(),
             };
 
             entityDenormalizer.on('done', (returnObject) => {
@@ -155,7 +159,8 @@ describe('Test the denormalizer workers to ensure they write the data to the que
             let paramContext = {
                 payload: lastWrittenEntity,
                 dbService: dbService,
-                entityDenormSchema: entityDenormalizedSchema
+                entityDenormSchema: entityDenormalizedSchema,
+                sequence: uuidv4(),
             };
 
             entityDenormalizer.on('done', (returnObject) => {

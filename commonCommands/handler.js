@@ -16,6 +16,7 @@ const getParamContext = (eventObj) => {
         payload,
         dbService,
         entitySchema,
+        sequence: eventObj.sequence,
       };
     case 'cmdUpdateEntity':
       return {
@@ -23,6 +24,7 @@ const getParamContext = (eventObj) => {
         dbService,
         entitySchema,
         payload: eventObj.payload,
+        sequence: eventObj.sequence,
       };
     default:
       throw new Error('Invalid command code');
@@ -35,6 +37,7 @@ const entityDenormalizerParamContext = function (eventObj) {
     dbService,
     entityDenormSchema,
     payload: eventObj.payload,
+    sequence: eventObj.sequence,
   };
 };
 
@@ -77,7 +80,7 @@ module.exports.commandHandler = (event, context, callback) => {
 
     const table = 'event-source';
     const eventDateTime = new Date();
-    const eventSequenceId = eventDateTime.getTime();
+    const eventSequenceId = uuidv4();
 
     let params = {
       TableName: table,
@@ -131,6 +134,7 @@ module.exports.eventHandler = (event, context, callback) => {
     // if (!snsTopicName) throw new Error(`No Handler found for command ${commandCode}`);
     const snsMessageObject = {
       id,
+      sequence: dynamoDbJsonEvent.sequence,
       command: commandCode,
       payload: dynamoDbJsonEvent.payload,
     };

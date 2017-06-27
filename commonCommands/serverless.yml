@@ -37,7 +37,7 @@ provider:
 functions:
   entityDenormalizer:
     handler: handler.entityDenormalizer
-    evnets:
+    events:
       - sns: arn:aws:sns:ap-southeast-2:296927073230:DeNormalizerSNSTopic
   entityCommandHandler:
     handler: handler.entityCommandHandler
@@ -69,46 +69,6 @@ resources:
       Properties:
         DisplayName: 'General Common Message Dispacher'
         TopicName: GeneralCommandSNSTopic
-    NotificationSNSTopic:
-      Type: "AWS::SNS::Topic"
-      Properties:
-        DisplayName: 'Notification Message Dispacher'
-        TopicName: NotificationSNSTopic
-    DocumentationSNSTopic:
-      Type: "AWS::SNS::Topic"
-      Properties:
-        DisplayName: 'Documentation Message Dispacher'
-        TopicName: DocumentationSNSTopic
-    UserGroupSNSTopic:
-      Type: "AWS::SNS::Topic"
-      Properties:
-        DisplayName: 'UserGroup Message Dispacher'
-        TopicName: UserGroupSNSTopic
-    TransactionSNSTopic:
-      Type: "AWS::SNS::Topic"
-      Properties:
-        DisplayName: 'Transaction Message Dispacher'
-        TopicName: TransactionSNSTopic
-    BuyerSNSTopic:
-      Type: "AWS::SNS::Topic"
-      Properties:
-        DisplayName: 'Buyer Message Dispacher'
-        TopicName: BuyerSNSTopic
-    SellerSNSTopic:
-      Type: "AWS::SNS::Topic"
-      Properties:
-        DisplayName: 'Seller Message Dispacher'
-        TopicName: SellerSNSTopic
-    IssuingBankSNSTopic:
-      Type: "AWS::SNS::Topic"
-      Properties:
-        DisplayName: 'IssuingBank Message Dispacher'
-        TopicName: IssuingBankSNSTopic
-    AdvisingBankSNSTopic:
-      Type: "AWS::SNS::Topic"
-      Properties:
-        DisplayName: 'AdvisingBank Message Dispacher'
-        TopicName: AdvisingBankSNSTopic
     DeNormalizerSNSTopic:
       Type: "AWS::SNS::Topic"
       Properties:
@@ -120,7 +80,7 @@ resources:
         TableName: event-source
         AttributeDefinitions:
           - AttributeName: sequence
-            AttributeType: N
+            AttributeType: S
         KeySchema:
           - AttributeName: sequence
             KeyType: HASH

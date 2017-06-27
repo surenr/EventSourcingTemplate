@@ -23,23 +23,28 @@
     }
   });
 
-  BaseAction.prototype.announceDone = results => new Promise((resolve, reject) => {
+  BaseAction.prototype.announceDone = (results, paramContext, context) => new Promise((resolve, reject) => {
     const promiseArray = [];
-    if (this.AnnounceTopicsArray) {
-      this.AnnounceTopicsArray.forEach((topic) => {
+    console.log('Announcing the entity change');
+    console.log(context.AnnounceTopicsArray);
+    if (context.AnnounceTopicsArray) {
+      context.AnnounceTopicsArray.forEach((topic) => {
         const snsMessageObject = {
           id: uuidv4(),
-          command: `${this.ActionName}${sysConfig.SYSTEM.DENORMALIZER_POSTFIX}`,
+          command: `${context.ActionName}${sysConfig.SYSTEM.DENORMALIZER_POSTFIX}`,
           payload: results,
+          sequence: paramContext.sequence,
         };
         const snsMessage = JSON.stringify(snsMessageObject);
         const snsTopicArn = topic;
         const sns = new AWS.SNS();
         const params = {
           Message: snsMessage,
-          Subject: `${this.ActionName} Completed`,
+          Subject: `${context.ActionName} Completed`,
           TopicArn: snsTopicArn,
         };
+        console.log(`Now announcing to topic: ${topic}`);
+        console.log(params);
         promiseArray.push(sns.publish(params).promise());
       });
     }
@@ -70,10 +75,15 @@
         });
 
         db.once('open', () => {
+          const that = this;
           this.doWork(paramContext).then((data) => {
             db.close((dbError) => {
               if (dbError) this.emit('error', dbError);
-              this.emit('done', data);
+              this.announceDone(data, paramContext, that).then((announcedData) => {
+                console.log(announcedData);
+                this.emit('done', data);
+              }, error => this.emit('error',
+                new Error(`Operation successful, Error in announcing the operation: ${error.message}`))).catch(error => this.emit(error));
             });
           }, (error) => {
             db.close((dbError) => {

@@ -79,7 +79,8 @@ describe('Test all Entity Commands', function () {
             let paramContext = {
                 payload: entityPayload,
                 dbService: dbService,
-                entitySchema: entitySchema
+                entitySchema: entitySchema,
+                sequence: uuidv4(),
             }
             addNewEntityWorker.on('done', (returnObject) => {
                 expect(returnObject).toBeTruthy();
@@ -101,9 +102,11 @@ describe('Test all Entity Commands', function () {
                     country: 'Australia'
                 },
                 dbService: dbService,
-                entitySchema: entitySchema
+                entitySchema: entitySchema,
+                sequence: uuidv4(),
             };
             updateEntityWorker.on('done', (returnObject)=> {
+                console.log(returnObject);
                 expect(returnObject.type).toEqual('bank');
                 expect(returnObject.entityId).toEqual(entityId);
                 lastChangedEntity = returnObject;

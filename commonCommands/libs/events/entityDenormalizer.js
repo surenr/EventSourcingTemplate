@@ -48,6 +48,7 @@
               });
             } else {
               const newEntity = new EntityDenormModel({
+                sequenceId: params.sequence,
                 entityId: payload.entityId,
                 type: payload.type,
                 name: payload.name,

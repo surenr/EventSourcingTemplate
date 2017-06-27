@@ -78,5 +78,5 @@ gulp.task('test-watch', function () {
 });
 gulp.task('test-all', ['Test Services']);
 gulp.task('default', ['copy common services']);
-gulp.task('deploy-all', gulpSequence(['copy common services', 'Deploy common service commands', 'Deploy user and group service commands', 'Deploy transaction commands']));
-gulp.task('remove-all', gulpSequence(['remove common service commands', 'remove user and group service commands', 'remove transaction commands']));
+gulp.task('deploy-all', gulpSequence(['copy common services', 'Deploy common service commands']));
+gulp.task('remove-all', gulpSequence(['remove common service commands']));

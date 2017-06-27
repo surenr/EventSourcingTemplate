@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const EntityDenormSchema = new mongoose.Schema({
+  sequenceId: {
+    type: String,
+    required: [true, 'NoSequenceId'],
+  },
   entityId: {
     type: String,
     required: [true, 'NoEntityId'],
