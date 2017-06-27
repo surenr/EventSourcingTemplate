@@ -34,4 +34,4 @@ functions:
   transactionCommandHandler:
     handler: handler.transactionCommandHandler
     events:
-      - sns: arn:aws:sns:ap-southeast-2:296927073230:TransactionSNSTopic
+      - sns: arn:aws:sns:ap-southeast-2:296927073230:GeneralCommandSNSTopic

@@ -34,4 +34,4 @@ functions:
   userGroupCommandHandler:
     handler: handler.userGroupCommandHandler
     events:
-      - sns: arn:aws:sns:ap-southeast-2:296927073230:UserGroupSNSTopic
+      - sns: arn:aws:sns:ap-southeast-2:296927073230:GeneralCommandSNSTopic

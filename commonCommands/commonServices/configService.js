@@ -1,12 +1,17 @@
 module.exports = {
+  SYSTEM: {
+    DENORMALIZER_POSTFIX: 'Completed',
+  },
+
   AWS: {
-    SNS_BASE_ARN: 'arn:aws:sns:ap-southeast-2:296927073230:',
+    SNS_BASE_ARN: 'arn:aws:sns:ap-southeast-2:296927073230:GeneralCommandSNSTopic',
+    SNS_DENORMALIZER_ARN: 'arn:aws:sns:ap-southeast-2:296927073230:DeNormalizerSNSTopic',
   },
   DB: {
     CONNECTION_STRING: 'mongodb://usrtradeitdb:tradeituserPa$$wd@SG-TradeIT-10478.servers.mongodirector.com:27017/tradeit',
     CONNECTION_STRING_QUERY: 'mongodb://usrtradeitdb:tradeituserPa$$wd@SG-TradeIT-10478.servers.mongodirector.com:27017/tradeit_query',
-    CONNECTION_STRING_TESTS: 'mongodb://usrtradeitdb:tradeituserPa$$wd@SG-TradeIT-10478.servers.mongodirector.com:27017/tradeit_tests',
-    CONNECTION_STRING_TESTS_QUERY: 'mongodb://usrtradeitdb:tradeituserPa$$wd@SG-TradeIT-10478.servers.mongodirector.com:27017/tradeit_test_query',
+    CONNECTION_STRING_TESTS: 'mongodb://localhost:27017/tradeit_tests', //'mongodb://usrtradeitdb:tradeituserPa$$wd@SG-TradeIT-10478.servers.mongodirector.com:27017/tradeit_tests',
+    CONNECTION_STRING_TESTS_QUERY: 'mongodb://localhost:27017/tradeit_test_query', //'mongodb://usrtradeitdb:tradeituserPa$$wd@SG-TradeIT-10478.servers.mongodirector.com:27017/tradeit_test_query',
   },
   ACTION_TYPES: {
     COMMAND: 'command',

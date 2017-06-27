@@ -31,13 +31,14 @@ provider:
       -  Effect: "Allow"
          Action:
            - "sns:publish"
-         Resource: "arn:aws:sns:ap-southeast-2:296927073230:*"
-      -  Effect: "Allow"
-         Action:
            - "sns:subscribe"
-         Resource: "arn:aws:sns:ap-southeast-2:296927073230:GeneralCommandSNSTopic"
-          
+         Resource: "arn:aws:sns:ap-southeast-2:296927073230:*"
+                
 functions:
+  entityDenormalizer:
+    handler: handler.entityDenormalizer
+    evnets:
+      - sns: arn:aws:sns:ap-southeast-2:296927073230:DeNormalizerSNSTopic
   entityCommandHandler:
     handler: handler.entityCommandHandler
     events:

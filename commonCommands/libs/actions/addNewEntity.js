@@ -5,11 +5,16 @@
   function AddNewEntity(type) {
     this.ActionName = 'cmdAddNewEntity';
     this.ActionType = type || sysConfig.ACTION_TYPES.COMMAND;
+    // Define which topics should be notified. Add the SNS topic ARNS which need to
+    // be notified below.
+    this.AnnounceTopicsArray = [sysConfig.AWS.SNS_DENORMALIZER_ARN];
+
     switch (this.ActionType) {
       case sysConfig.ACTION_TYPES.COMMAND:
         this.CONNECTION_STRING = sysConfig.DB.CONNECTION_STRING;
         break;
       case sysConfig.ACTION_TYPES.COMMAND_TEST:
+        this.AnnounceTopicsArray = []; // For tests we don't want to announce to the world
         this.CONNECTION_STRING = sysConfig.DB.CONNECTION_STRING_TESTS;
         break;
       default:
@@ -24,7 +29,7 @@
       if (generalValidationErrors) {
         reject(generalValidationErrors);
       } else {
-        entityModel.find({ entityId: payload.entityId },
+        entityModel.find({ name: payload.name, type: payload.type },
           (err, docs) => {
             if (err) reject(err);
 
@@ -37,6 +42,7 @@
       }
     });
   }
+
   AddNewEntity.prototype.doWork = function (params) {
     return new Promise((resolve, reject) => {
       try {

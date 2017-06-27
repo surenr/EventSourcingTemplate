@@ -5,6 +5,11 @@
   const uuidv4 = require('uuid/v4');
   const sysConfig = require('../../commonServices/configService');
   function LoginUserAction(type) {
+    // Define which topics should be notified. Add the SNS topic ARNS which need to
+    // be notified below.
+    this.AnnounceTopicsArray = [sysConfig.AWS.SNS_DENORMALIZER_ARN];
+
+
     this.ActionName = 'cmdLoginUser';
     this.ActionType = type || sysConfig.ACTION_TYPES.COMMAND;
     switch (this.ActionType) {
@@ -12,6 +17,7 @@
         this.CONNECTION_STRING = sysConfig.DB.CONNECTION_STRING;
         break;
       case sysConfig.ACTION_TYPES.COMMAND_TEST:
+        this.AnnounceTopicsArray = []; // For tests we don't want to announce to the world
         this.CONNECTION_STRING = sysConfig.DB.CONNECTION_STRING_TESTS;
         break;
       default:

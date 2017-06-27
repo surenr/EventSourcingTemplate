@@ -17,7 +17,10 @@ module.exports.commonEventHandler = (event, context, workerArray, getParamContex
       worker.on('done', (response) => {
         console.log('worker succeeded. Need to inform the De-normalizer');
         console.log(response);
-        callback(null, response);
+        console.log('Get the worker to announce the world the work is done');
+        worker.announceDone(response).then((announcedData) => {
+          callback(null, announcedData);
+        }, error => callback(error, null)).catch(error => callback(error, null));
       });
       worker.perform(eventActionCommand, getParamContext(eventObject));
     });

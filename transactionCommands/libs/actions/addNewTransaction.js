@@ -1,8 +1,13 @@
 (function () {
   const util = require('util');
   const baseAction = require('../../commonServices/baseAction');
+  const sysConfig = require('../../commonServices/configService');
 
   function AddNewTransactionAction() {
+    // Define which topics should be notified. Add the SNS topic ARNS which need to
+    // be notified below.
+    this.AnnounceTopicsArray = [sysConfig.AWS.SNS_DENORMALIZER_ARN];
+
     this.ActionName = 'cmdAddNewTransaction';
   }
   util.inherits(AddNewTransactionAction, baseAction);

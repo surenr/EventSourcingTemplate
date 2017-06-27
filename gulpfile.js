@@ -25,6 +25,19 @@ gulp.task('Deploy transaction commands', shell.task([
     '"../node_modules/.bin/serverless" deploy -v'
 ], { cwd: './transactionCommands' }));
 
+// Remove Each service
+gulp.task('remove common service commands', shell.task([
+    '"../node_modules/.bin/serverless" remove -v'
+], { cwd: './commonCommands' }));
+
+gulp.task('remove user and group service commands', shell.task([
+    '"../node_modules/.bin/serverless" remove -v'
+], { cwd: './userGroupCommands' }));
+
+gulp.task('remove transaction commands', shell.task([
+    '"../node_modules/.bin/serverless" remove -v'
+], { cwd: './transactionCommands' }));
+
 // // Add the Testing capabilities for all the services
 // gulp.task('Test Common Services', function () {
 //     return gulp.src(['./commonServices/tests/**/test*.js'])
@@ -39,6 +52,16 @@ gulp.task('Deploy transaction commands', shell.task([
 // gulp.task('Test Services', ['copy common services'], shell.task([
 //     '"./node_modules/.bin/jasmine-node" commonCommands/ commonServices/ userGroupCommands/ transactionCommands/ --color --verbose --junitreport --output reports'
 // ], { cwd: '.' }));
+
+gulp.task('test_userGroup_services', ['copy common services'], function () {
+    return gulp.src(['userGroupCommands/tests/**/*.js'])
+        .pipe(jasmine({ verbose: true, includeStackTrace: true }));
+});
+
+gulp.task('test_transaction_services', ['copy common services'], function () {
+    return gulp.src(['transactionCommands/tests/**/*.js'])
+        .pipe(jasmine({ verbose: true, includeStackTrace: true }));
+});
 
 gulp.task('test_common_services', ['copy common services'], function () {
     return gulp.src(['commonCommands/tests/**/*.js'])
@@ -56,3 +79,4 @@ gulp.task('test-watch', function () {
 gulp.task('test-all', ['Test Services']);
 gulp.task('default', ['copy common services']);
 gulp.task('deploy-all', gulpSequence(['copy common services', 'Deploy common service commands', 'Deploy user and group service commands', 'Deploy transaction commands']));
+gulp.task('remove-all', gulpSequence(['remove common service commands', 'remove user and group service commands', 'remove transaction commands']));

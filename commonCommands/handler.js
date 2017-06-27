@@ -29,6 +29,25 @@ const getParamContext = (eventObj) => {
   }
 };
 
+const entityDenormalizerParamContext = function (eventObj) {
+  const entityDenormSchema = require('./libs/domain/entity-denorm');
+  return {
+    dbService,
+    entityDenormSchema,
+    payload: eventObj.payload,
+  };
+};
+
+module.exports.entityDenormalizer = (event, context, callback) => {
+  // get the list of denormalizer for this service
+  const EntityDenormalizer = require('./libs/events/entityDenormalizer');
+  const denormalizerInstances = [
+    new EntityDenormalizer(sysConfig.ACTION_TYPES.QUERY),
+  ];
+  handler.commonEventHandler(event, context, denormalizerInstances, entityDenormalizerParamContext,
+    callback);
+};
+
 module.exports.entityCommandHandler = (event, context, callback) => {
   const AddNewEntity = require('./libs/actions/addNewEntity');
   const UpdateEntity = require('./libs/actions/updateEntity');
@@ -108,16 +127,16 @@ module.exports.eventHandler = (event, context, callback) => {
     const snsSubject = dynamoDbJsonEvent.commandName ? dynamoDbJsonEvent.commandName : '';
     const id = dynamoDbJsonEvent.id ? dynamoDbJsonEvent.id : '';
     if (!commandCode) throw new Error('Event without command code');
-    const snsTopicName = sysConfig.COMMAND_TOPIC_MAP[commandCode];
-    if (!snsTopicName) throw new Error(`No Handler found for command ${commandCode}`);
+    // const snsTopicName = 'GeneralCommandSNSTopic'; // sysConfig.COMMAND_TOPIC_MAP[commandCode];
+    // if (!snsTopicName) throw new Error(`No Handler found for command ${commandCode}`);
     const snsMessageObject = {
       id,
       command: commandCode,
       payload: dynamoDbJsonEvent.payload,
     };
     const snsMessage = JSON.stringify(snsMessageObject);
-
-    const snsTopicArn = `${sysConfig.AWS.SNS_BASE_ARN}${snsTopicName}`;
+    const snsTopicArn = sysConfig.AWS.SNS_BASE_ARN;
+    // `${sysConfig.AWS.SNS_BASE_ARN}${snsTopicName}`;
     const sns = new AWS.SNS();
     const params = {
       Message: snsMessage,

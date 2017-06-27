@@ -3,6 +3,11 @@
   const baseAction = require('../../commonServices/baseAction');
   const sysConfig = require('../../commonServices/configService');
   function UpdateUserAction(type) {
+    // Define which topics should be notified. Add the SNS topic ARNS which need to
+    // be notified below.
+    this.AnnounceTopicsArray = [sysConfig.AWS.SNS_DENORMALIZER_ARN];
+
+
     this.ActionName = 'cmdUpdateUser';
     this.ActionType = type || sysConfig.ACTION_TYPES.COMMAND;
     switch (this.ActionType) {
@@ -10,6 +15,7 @@
         this.CONNECTION_STRING = sysConfig.DB.CONNECTION_STRING;
         break;
       case sysConfig.ACTION_TYPES.COMMAND_TEST:
+        this.AnnounceTopicsArray = []; // For tests we don't want to announce to the world
         this.CONNECTION_STRING = sysConfig.DB.CONNECTION_STRING_TESTS;
         break;
       default:
@@ -39,6 +45,7 @@
               if (docs.length > 0) {
                 UserModel.findByIdAndUpdate(targetObjectId, { $set: payload }, { new: true },
                   (userError, updatedUser) => {
+                    console.log(userError);
                     if (userError) return reject(userError);
                     return resolve(updatedUser);
                   });

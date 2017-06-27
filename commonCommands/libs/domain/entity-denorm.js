@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const EntitySchema = new mongoose.Schema({
+const EntityDenormSchema = new mongoose.Schema({
   entityId: {
     type: String,
     required: [true, 'NoEntityId'],
@@ -8,7 +8,10 @@ const EntitySchema = new mongoose.Schema({
   type: {
     type: String,
     required: [true, 'NoType'],
-    enum: ['Company', 'Bank'],
+    enum: {
+      values: ['Company', 'Bank'],
+      message: 'InvalidType',
+    },
   },
   name: {
     type: String,
@@ -28,4 +31,4 @@ const EntitySchema = new mongoose.Schema({
   },
 });
 
-module.exports = EntitySchema;
+module.exports = EntityDenormSchema;

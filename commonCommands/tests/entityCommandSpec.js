@@ -8,7 +8,7 @@ let entityId = uuidv4();
 let entityRegDate = new Date();
 let entityPayload = {
     entityId: entityId,
-    type: 'company',
+    type: 'Company',
     name: 'XYZ Company',
     registered_date: entityRegDate,
     registration_number: '388393293',
@@ -61,7 +61,7 @@ describe('Test all Entity Commands', function () {
         });
         it('Entity Schema Structure has the minimal required properties', function () {
             expect(entity.entityId).toEqual(entityId);
-            expect(entity.type).toEqual('company');
+            expect(entity.type).toEqual('Company');
             expect(entity.name).toEqual('XYZ Company');
             expect(entity.registered_date).toEqual(entityRegDate);
             expect(entity.registration_number).toEqual('388393293');

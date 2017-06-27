@@ -1,22 +1,27 @@
-
 const dbService = require('mongoose');
 const userSchema = require('./libs/domain/users');
 const userGroupSchema = require('./libs/domain/user-group');
 const activeUserSchema = require('./libs/domain/loggedInUser');
 const sysConfig = require('./commonServices/configService');
 const handler = require('./commonServices/eventHandler');
+const uuidv4 = require('uuid/v4');
+
 
 const getParamContext = (eventObj) => {
   switch (eventObj.command) {
     case 'cmdAddNewGroup':
+      const groupPayload = eventObj.payload;
+      groupPayload.groupId = uuidv4();
       return {
-        payload: eventObj.payload,
+        payload: groupPayload,
         dbService,
         userGroupSchema,
       };
     case 'cmdAddNewUser':
+      const userPayload = eventObj.payload;
+      userPayload.userid = uuidv4();
       return {
-        payload: eventObj.payload,
+        payload: userPayload,
         dbService,
         userGroupSchema,
         userSchema,
