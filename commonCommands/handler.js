@@ -41,6 +41,25 @@ const entityDenormalizerParamContext = function (eventObj) {
   };
 };
 
+const errorDenormalizerParamContext = function (eventObj) {
+  const errorSchema = require('./libs/domain/errors');
+  return {
+    dbService,
+    errorSchema,
+    payload: eventObj.payload,
+    sequence: eventObj.sequence,
+  };
+};
+
+module.exports.errorMessageHanlder = (event, context, callback) => {
+  const ErrorDenormalizer = require('./libs/events/errorDenormalizer');
+  const errorDenormalizers = [
+    new ErrorDenormalizer(sysConfig.ACTION_TYPES.QUERY),
+  ];
+  handler.commonEventHandler(event, context, errorDenormalizers, errorDenormalizerParamContext,
+    callback);
+};
+
 module.exports.entityDenormalizer = (event, context, callback) => {
   // get the list of denormalizer for this service
   const EntityDenormalizer = require('./libs/events/entityDenormalizer');

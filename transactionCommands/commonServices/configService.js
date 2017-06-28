@@ -6,6 +6,7 @@ module.exports = {
   AWS: {
     SNS_BASE_ARN: 'arn:aws:sns:ap-southeast-2:296927073230:GeneralCommandSNSTopic',
     SNS_DENORMALIZER_ARN: 'arn:aws:sns:ap-southeast-2:296927073230:DeNormalizerSNSTopic',
+    SNS_ERROR_ARN: 'arn:aws:sns:ap-southeast-2:296927073230:ErrorMessageSNSTopic',
   },
   DB: {
     CONNECTION_STRING: 'mongodb://usrtradeitdb:tradeituserPa$$wd@SG-TradeIT-10478.servers.mongodirector.com:27017/tradeit',

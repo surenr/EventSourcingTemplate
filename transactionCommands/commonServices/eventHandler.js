@@ -1,3 +1,4 @@
+const sysConfig = require('./configService');
 module.exports.commonEventHandler = (event, context, workerArray, getParamContext, callback) => {
   const eventRecords = event.Records;
   eventRecords.forEach((eventElement) => {
@@ -11,11 +12,34 @@ module.exports.commonEventHandler = (event, context, workerArray, getParamContex
         console.log('worker reported errors');
         // log the error
         console.log(error);
-        // Call the d
-        callback(error, null);
+        worker.announceFail(error, getParamContext(eventObject), worker)
+          .then((announceResponse) => {
+            console.log(announceResponse);
+            // For Errors that are Successfully recorded we are removing the message from queue.
+            callback(null, error);
+          }, (messageError) => {
+            console.log('Message Error: ', messageError);
+            console.log('App Error: ', error);
+            callback(messageError, null);
+          }).catch((messageError) => {
+            console.log('Message Error: ', messageError);
+            console.log('App Error: ', error);
+            callback(messageError, null);
+          });
       });
       worker.on('done', (response) => {
-        callback(null, response);
+        console.log(worker.ActionType);
+        worker.announceDone(response, getParamContext(eventObject), worker)
+          .then((announcedData) => {
+            console.log(announcedData);
+            callback(null, response);
+          }, (error) => {
+            console.log(error);
+            callback(error, null);
+          }).catch((error) => {
+            console.log(error);
+            callback(error, null);
+          });
       });
       worker.perform(eventActionCommand, getParamContext(eventObject));
     });

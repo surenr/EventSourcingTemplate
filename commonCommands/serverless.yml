@@ -35,6 +35,10 @@ provider:
          Resource: "arn:aws:sns:ap-southeast-2:296927073230:*"
                 
 functions:
+  errorMessageHanlder:
+    handler: handler.errorMessageHanlder
+    events:
+      - sns: arn:aws:sns:ap-southeast-2:296927073230:ErrorMessageSNSTopic
   entityDenormalizer:
     handler: handler.entityDenormalizer
     events:
@@ -74,6 +78,11 @@ resources:
       Properties:
         DisplayName: 'DeNormalizer Message Dispacher'
         TopicName: DeNormalizerSNSTopic
+    ErrorMessageSNSTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        DisplayName: 'Error Message Dispacher'
+        TopicName: ErrorMessageSNSTopic
     EventSource:
       Type: AWS::DynamoDB::Table
       Properties:

@@ -23,6 +23,34 @@
     }
   });
 
+  BaseAction.prototype.announceFail = (error, paramContext, context) =>
+    new Promise((resolve, reject) => {
+      console.log('Announcing command failure');
+      const payload = {
+        errorCode: error.code || '1',
+        message: error.message,
+        reported_date: new Date(),
+        fullError: error.stack || 'No Stack Trace',
+      };
+      const snsMessageObject = {
+        id: uuidv4(),
+        command: 'cmdError',
+        sequence: paramContext.sequence,
+        payload,
+      };
+      const snsMessage = JSON.stringify(snsMessageObject);
+      const snsTopicArn = sysConfig.AWS.SNS_ERROR_ARN;
+      const sns = new AWS.SNS();
+      const params = {
+        Message: snsMessage,
+        Subject: `${context.ActionName} Failed`,
+        TopicArn: snsTopicArn,
+      };
+      sns.publish(params).promise().then((response) => {
+        resolve(response);
+      }, snsError => reject(snsError)).catch(snsError => reject(snsError));
+    });
+
   BaseAction.prototype.announceDone = (results, paramContext, context) => new Promise((resolve, reject) => {
     const promiseArray = [];
     console.log('Announcing the entity change');
@@ -75,15 +103,10 @@
         });
 
         db.once('open', () => {
-          const that = this;
           this.doWork(paramContext).then((data) => {
             db.close((dbError) => {
               if (dbError) this.emit('error', dbError);
-              this.announceDone(data, paramContext, that).then((announcedData) => {
-                console.log(announcedData);
-                this.emit('done', data);
-              }, error => this.emit('error',
-                new Error(`Operation successful, Error in announcing the operation: ${error.message}`))).catch(error => this.emit(error));
+              this.emit('done', data);
             });
           }, (error) => {
             db.close((dbError) => {
